@@ -790,6 +790,10 @@ public:
 	// need to Ref/Unref it when calling the default function.
 	Val* Lookup(Val* index, bool use_default_val = true);
 
+	// Returns a table containing all elements that match the given
+	// index in an extended sense (e.g. all subnets for an IP).
+	TableVal* LookupAll(Val* index);
+
 	// Sets the timestamp for the given index to network time.
 	// Returns false if index does not exist.
 	bool UpdateTimestamp(Val* index);

@@ -1330,6 +1330,28 @@ function order%(v: any, ...%) : index_vec
 	return result_v;
 	%}
 
+## Filters a table returning all elements that match the given index in an
+## an extended sense:
+##   table[subnet] - all subnets that contain the given subnet
+## For other types, the default lookup is performed.
+##
+## v: The table or set to search.
+##
+## idx: The index to look up.
+##
+## Returns: A table containing all elements that match the given index in
+##          an extended sense.
+function lookup_all%(v: any, idx: any%): any
+	%{
+	if ( v->Type()->Tag() == TYPE_TABLE )
+		// TODO: check idx type is matching
+		return v->AsTableVal()->LookupAll(idx);
+	else
+		builtin_error("lookup_all() requires a table/set argument");
+
+	return 0;
+	%}
+
 # ===========================================================================
 #
 #                              String Processing

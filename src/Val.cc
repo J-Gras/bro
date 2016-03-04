@@ -1833,6 +1833,18 @@ Val* TableVal::Lookup(Val* index, bool use_default_val)
 	return def;
 	}
 
+TableVal* TableVal::LookupAll(Val* index)
+	{
+	if ( subnets )
+		return (TableVal*) subnets->LookupAll(index);
+
+	TableVal* result = new TableVal(table_type, attrs);
+	Val* elem = Lookup(index, true);
+
+	result->Assign(index, elem);
+	return result;
+	}
+
 bool TableVal::UpdateTimestamp(Val* index)
 	{
 	TableEntryVal* v;

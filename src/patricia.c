@@ -662,6 +662,105 @@ patricia_search_best (patricia_tree_t *patricia, prefix_t *prefix)
     return (patricia_search_best2 (patricia, prefix, 1));
 }
 
+/* Returns -1 if the size nodes is not sufficient and the number of
+   patricia nodes found otherwise.
+*/
+int
+patricia_search_all (patricia_tree_t *patricia, prefix_t *prefix,
+    patricia_node_t **nodes, int nodes_size)
+{
+    patricia_node_t *node;
+    u_char *addr;
+    u_int bitlen;
+    int cnt = 0;
+
+    assert (patricia);
+    assert (prefix);
+    assert (prefix->bitlen <= patricia->maxbits);
+    assert (nodes);
+
+    if (patricia->head == NULL)
+    return (0);
+
+    node = patricia->head;
+    addr = prefix_touchar (prefix);
+    bitlen = prefix->bitlen;
+
+    while (node->bit < bitlen) {
+
+        if (node->prefix) {
+#ifdef PATRICIA_DEBUG
+                fprintf (stderr, "patricia_search_best: push %s/%d\n",
+                     prefix_toa (node->prefix), node->prefix->bitlen);
+#endif /* PATRICIA_DEBUG */
+            nodes[cnt++] = node;
+            if (cnt >= nodes_size)
+                // not enough space
+                return (-1);
+        }
+
+        if (BIT_TEST (addr[node->bit >> 3], 0x80 >> (node->bit & 0x07))) {
+#ifdef PATRICIA_DEBUG
+            if (node->prefix)
+                    fprintf (stderr, "patricia_search_best: take right %s/%d\n",
+                         prefix_toa (node->prefix), node->prefix->bitlen);
+            else
+                    fprintf (stderr, "patricia_search_best: take right at %d\n",
+                 node->bit);
+#endif /* PATRICIA_DEBUG */
+            node = node->r;
+        }
+        else {
+#ifdef PATRICIA_DEBUG
+            if (node->prefix)
+                    fprintf (stderr, "patricia_search_best: take left %s/%d\n",
+                         prefix_toa (node->prefix), node->prefix->bitlen);
+            else
+                    fprintf (stderr, "patricia_search_best: take left at %d\n",
+                 node->bit);
+#endif /* PATRICIA_DEBUG */
+            node = node->l;
+        }
+
+        if (node == NULL)
+            break;
+    }
+
+    if (cnt < nodes_size && node && node->prefix)
+    nodes[cnt++] = node;
+
+#ifdef PATRICIA_DEBUG
+    if (node == NULL)
+        fprintf (stderr, "patricia_search_best: stop at null\n");
+    else if (node->prefix)
+        fprintf (stderr, "patricia_search_best: stop at %s/%d\n",
+             prefix_toa (node->prefix), node->prefix->bitlen);
+    else
+        fprintf (stderr, "patricia_search_best: stop at %d\n", node->bit);
+#endif /* PATRICIA_DEBUG */
+
+    if (cnt <= 0)
+    return (0);
+
+    while (--cnt >= 0) {
+        node = nodes[cnt];
+#ifdef PATRICIA_DEBUG
+            fprintf (stderr, "patricia_search_best: pop %s/%d\n",
+                 prefix_toa (node->prefix), node->prefix->bitlen);
+#endif /* PATRICIA_DEBUG */
+        if (comp_with_mask (prefix_tochar (node->prefix),
+                    prefix_tochar (prefix),
+                    node->prefix->bitlen)) {
+#ifdef PATRICIA_DEBUG
+                fprintf (stderr, "patricia_search_best: found %s/%d\n",
+                     prefix_toa (node->prefix), node->prefix->bitlen);
+#endif /* PATRICIA_DEBUG */
+            return (cnt +1);
+        }
+    }
+    return (0);
+}
+
 
 patricia_node_t *
 patricia_lookup (patricia_tree_t *patricia, prefix_t *prefix)

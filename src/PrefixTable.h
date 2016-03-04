@@ -36,6 +36,9 @@ public:
 	void* Lookup(const IPAddr& addr, int width, bool exact = false) const;
 	void* Lookup(const Val* value, bool exact = false) const;
 
+	void* LookupAll(const IPAddr& addr, int width) const;
+	void* LookupAll(const Val* value) const;
+
 	// Returns pointer to data or nil if not found.
 	void* Remove(const IPAddr& addr, int width);
 	void* Remove(const Val* value);

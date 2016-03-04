@@ -1,5 +1,6 @@
 #include "PrefixTable.h"
 #include "Reporter.h"
+#include "NetVar.h"
 
 inline static prefix_t* make_prefix(const IPAddr& addr, int width)
 	{
@@ -83,6 +84,63 @@ void* PrefixTable::Lookup(const Val* value, bool exact) const
 	case TYPE_SUBNET:
 		return Lookup(value->AsSubNet().Prefix(),
 				value->AsSubNet().LengthIPv6(), exact);
+		break;
+
+	default:
+		reporter->InternalWarning("Wrong index type %d for PrefixTable",
+		                          value->Type()->Tag());
+		return 0;
+	}
+	}
+
+void* PrefixTable::LookupAll(const IPAddr& addr, int width) const
+	{
+	const int max_nodes = 128 +1;
+	patricia_node_t* nodes[max_nodes];
+	prefix_t* prefix = make_prefix(addr, width);
+
+	int nodes_size = patricia_search_all(tree, prefix, &nodes[0], max_nodes);
+	Deref_Prefix(prefix);
+
+	TableVal* result = new TableVal(subnet_table);
+
+	// cerate result table
+	for ( int i = 0; i < nodes_size; i++ )
+		{
+		prefix_t* prefix = nodes[i]->prefix;
+		IPAddr* prefix_addr = new IPAddr(prefix->add.sin6);
+		int prefix_width = prefix->bitlen;
+
+		if ( prefix_addr->GetFamily() == IPv4 )
+			prefix_width = prefix_width - 96;
+
+		SubNetVal* idx = new SubNetVal(*prefix_addr, prefix_width);
+		TableEntryVal* v = (TableEntryVal*) nodes[i]->data;
+
+		result->Assign(idx, v->Value());
+
+		// update access time
+		// copy value?
+		}
+
+	return result;
+	}
+
+void* PrefixTable::LookupAll(const Val* value) const
+	{
+	// [elem] -> elem
+	if ( value->Type()->Tag() == TYPE_LIST &&
+	     value->AsListVal()->Length() == 1 )
+		value = value->AsListVal()->Index(0);
+
+	switch ( value->Type()->Tag() ) {
+	case TYPE_ADDR:
+		return LookupAll(value->AsAddr(), 128);
+		break;
+
+	case TYPE_SUBNET:
+		return LookupAll(value->AsSubNet().Prefix(),
+				value->AsSubNet().LengthIPv6());
 		break;
 
 	default:
