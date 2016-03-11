@@ -247,8 +247,6 @@ extern StringVal* global_hash_seed;
 
 extern bro_uint_t bits_per_uid;
 
-extern TableType* subnet_table;
-
 // Initializes globals that don't pertain to network/event analysis.
 extern void init_general_global_var();
 

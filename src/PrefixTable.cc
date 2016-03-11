@@ -93,40 +93,19 @@ void* PrefixTable::Lookup(const Val* value, bool exact) const
 	}
 	}
 
-void* PrefixTable::LookupAll(const IPAddr& addr, int width) const
+PrefixTable::iterator* PrefixTable::InitLookupAll(const IPAddr& addr, int width) const
 	{
-	const int max_nodes = 128 +1;
-	patricia_node_t* nodes[max_nodes];
-	prefix_t* prefix = make_prefix(addr, width);
+	iterator* i = new iterator();
+	i->cnt = 0;
 
-	int nodes_size = patricia_search_all(tree, prefix, &nodes[0], max_nodes);
+	prefix_t* prefix = make_prefix(addr, width);
+	i->Xstack_size = patricia_search_all(tree, prefix, i->Xstack, PATRICIA_MAXBITS+1);
 	Deref_Prefix(prefix);
 
-	TableVal* result = new TableVal(subnet_table);
-
-	// cerate result table
-	for ( int i = 0; i < nodes_size; i++ )
-		{
-		prefix_t* prefix = nodes[i]->prefix;
-		IPAddr* prefix_addr = new IPAddr(prefix->add.sin6);
-		int prefix_width = prefix->bitlen;
-
-		if ( prefix_addr->GetFamily() == IPv4 )
-			prefix_width = prefix_width - 96;
-
-		SubNetVal* idx = new SubNetVal(*prefix_addr, prefix_width);
-		TableEntryVal* v = (TableEntryVal*) nodes[i]->data;
-
-		result->Assign(idx, v->Value());
-
-		// update access time
-		// copy value?
-		}
-
-	return result;
+	return i;
 	}
 
-void* PrefixTable::LookupAll(const Val* value) const
+PrefixTable::iterator* PrefixTable::InitLookupAll(const Val* value) const
 	{
 	// [elem] -> elem
 	if ( value->Type()->Tag() == TYPE_LIST &&
@@ -135,19 +114,41 @@ void* PrefixTable::LookupAll(const Val* value) const
 
 	switch ( value->Type()->Tag() ) {
 	case TYPE_ADDR:
-		return LookupAll(value->AsAddr(), 128);
+		return InitLookupAll(value->AsAddr(), 128);
 		break;
 
 	case TYPE_SUBNET:
-		return LookupAll(value->AsSubNet().Prefix(),
+		return InitLookupAll(value->AsSubNet().Prefix(),
 				value->AsSubNet().LengthIPv6());
 		break;
 
 	default:
 		reporter->InternalWarning("Wrong index type %d for PrefixTable",
 		                          value->Type()->Tag());
-		return 0;
+		return NULL;
 	}
+	}
+
+bool PrefixTable::NextLookupAll(iterator* i, Val* &value, void* &data) const
+	{
+	if ( i->cnt >= i->Xstack_size )
+		return false;
+
+	prefix_t* prefix = i->Xstack[i->cnt]->prefix;
+	IPAddr* prefix_addr = new IPAddr(prefix->add.sin6);
+	int prefix_width = prefix->bitlen;
+
+	if ( prefix_addr->GetFamily() == IPv4 )
+		prefix_width = prefix_width - 96;
+
+	SubNetVal* idx = new SubNetVal(*prefix_addr, prefix_width);
+	delete prefix_addr;
+
+	value = idx;
+	data =  i->Xstack[i->cnt]->data;
+
+	i->cnt++;
+	return true;
 	}
 
 void* PrefixTable::Remove(const IPAddr& addr, int width)
@@ -194,6 +195,9 @@ PrefixTable::iterator PrefixTable::InitIterator()
 	i.Xsp = i.Xstack;
 	i.Xrn = tree->head;
 	i.Xnode = 0;
+	// not used:
+	i.Xstack_size = 0;
+	i.cnt = -1;
 	return i;
 	}
 

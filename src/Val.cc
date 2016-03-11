@@ -1788,15 +1788,7 @@ Val* TableVal::Lookup(Val* index, bool use_default_val)
 		TableEntryVal* v = (TableEntryVal*) subnets->Lookup(index);
 		if ( v )
 			{
-			if ( attrs &&
-				 ! (attrs->FindAttr(ATTR_EXPIRE_WRITE) ||
-				attrs->FindAttr(ATTR_EXPIRE_CREATE)) )
-				{
-				v->SetExpireAccess(network_time);
-				if ( LoggingAccess() && expire_time )
-					ReadOperation(index, v);
-				}
-
+			UpdateReadExpire(index, v);
 			return v->Value() ? v->Value() : this;
 			}
 
@@ -1821,15 +1813,7 @@ Val* TableVal::Lookup(Val* index, bool use_default_val)
 
 			if ( v )
 				{
-				if ( attrs &&
-				     ! (attrs->FindAttr(ATTR_EXPIRE_WRITE) ||
-					attrs->FindAttr(ATTR_EXPIRE_CREATE)) )
-					{
-					v->SetExpireAccess(network_time);
-					if ( LoggingAccess() && expire_time )
-						ReadOperation(index, v);
-					}
-
+				UpdateReadExpire(index, v);
 				return v->Value() ? v->Value() : this;
 				}
 			}
@@ -1847,7 +1831,24 @@ Val* TableVal::Lookup(Val* index, bool use_default_val)
 TableVal* TableVal::LookupAll(Val* index)
 	{
 	if ( subnets )
-		return (TableVal*) subnets->LookupAll(index);
+		{
+		TableVal* result = new TableVal(table_type);
+		Val* idx;
+		void* data;
+
+		PrefixTable::iterator* i = subnets->InitLookupAll(index);
+		while ( subnets->NextLookupAll(i, idx, data) )
+			{
+			TableEntryVal* v = (TableEntryVal*) data;
+			if ( v )
+				UpdateReadExpire(index, v);
+			// TODO: copy value?
+			result->Assign(idx, v ? v->Value() : NULL);
+			}
+		delete i;
+
+		return result;
+		}
 
 	TableVal* result = new TableVal(table_type, attrs);
 	Val* elem = Lookup(index, true);
@@ -2262,6 +2263,18 @@ double TableVal::CallExpireFunc(Val* idx)
 		}
 
 	return secs;
+	}
+
+void TableVal::UpdateReadExpire(Val* index, TableEntryVal* v)
+	{
+	if ( attrs &&
+		 ! (attrs->FindAttr(ATTR_EXPIRE_WRITE) ||
+		attrs->FindAttr(ATTR_EXPIRE_CREATE)) )
+		{
+		v->SetExpireAccess(network_time);
+		if ( LoggingAccess() && expire_time )
+			ReadOperation(index, v);
+		}
 	}
 
 void TableVal::ReadOperation(Val* index, TableEntryVal* v)

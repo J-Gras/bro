@@ -11,14 +11,20 @@ extern "C" {
 
 class PrefixTable {
 private:
+	patricia_tree_t* tree;
+
+public:
 	struct iterator {
+	private:
 		patricia_node_t* Xstack[PATRICIA_MAXBITS+1];
 		patricia_node_t** Xsp;
 		patricia_node_t* Xrn;
 		patricia_node_t* Xnode;
+		int Xstack_size;
+		int cnt;
+	friend PrefixTable;
 	};
 
-public:
 	PrefixTable()	{ tree = New_Patricia(128); }
 	~PrefixTable()	{ Destroy_Patricia(tree, 0); }
 
@@ -36,8 +42,12 @@ public:
 	void* Lookup(const IPAddr& addr, int width, bool exact = false) const;
 	void* Lookup(const Val* value, bool exact = false) const;
 
-	void* LookupAll(const IPAddr& addr, int width) const;
-	void* LookupAll(const Val* value) const;
+	// Returns an iterator that can be used to lookup all prefixes
+	// that contain the given prefix.
+	iterator* InitLookupAll(const IPAddr& addr, int width) const;
+	iterator* InitLookupAll(const Val* value) const;
+	// Returns true as long as the call retrieved a valid item.
+	bool NextLookupAll(iterator* i, Val* &value, void* &data) const;
 
 	// Returns pointer to data or nil if not found.
 	void* Remove(const IPAddr& addr, int width);
@@ -47,8 +57,6 @@ public:
 
 	iterator InitIterator();
 	void* GetNext(iterator* i);
-
-	patricia_tree_t* tree;
 };
 
 #endif

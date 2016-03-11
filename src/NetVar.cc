@@ -243,8 +243,6 @@ StringVal* global_hash_seed;
 
 bro_uint_t bits_per_uid;
 
-TableType* subnet_table;
-
 #include "const.bif.netvar_def"
 #include "types.bif.netvar_def"
 #include "event.bif.netvar_def"
@@ -530,5 +528,4 @@ void init_net_var()
 	call_argument_vector = internal_type("call_argument_vector")->AsVectorType();
 	call_argument = internal_type("call_argument")->AsRecordType();
 
-	subnet_table = internal_type("subnet_table")->AsTableType();
 	}

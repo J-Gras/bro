@@ -855,6 +855,9 @@ protected:
 	// takes ownership of the reference.
 	double CallExpireFunc(Val *idx);
 
+	// Updates read expiration timeout if necessary and
+	// propagates read operation.
+	void UpdateReadExpire(Val* index, TableEntryVal* v);
 	// Propagates a read operation if necessary.
 	void ReadOperation(Val* index, TableEntryVal *v);
 

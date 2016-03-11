@@ -690,7 +690,7 @@ patricia_search_all (patricia_tree_t *patricia, prefix_t *prefix,
 
         if (node->prefix) {
 #ifdef PATRICIA_DEBUG
-                fprintf (stderr, "patricia_search_best: push %s/%d\n",
+                fprintf (stderr, "patricia_search_all: push %s/%d\n",
                      prefix_toa (node->prefix), node->prefix->bitlen);
 #endif /* PATRICIA_DEBUG */
             nodes[cnt++] = node;
@@ -702,10 +702,10 @@ patricia_search_all (patricia_tree_t *patricia, prefix_t *prefix,
         if (BIT_TEST (addr[node->bit >> 3], 0x80 >> (node->bit & 0x07))) {
 #ifdef PATRICIA_DEBUG
             if (node->prefix)
-                    fprintf (stderr, "patricia_search_best: take right %s/%d\n",
+                    fprintf (stderr, "patricia_search_all: take right %s/%d\n",
                          prefix_toa (node->prefix), node->prefix->bitlen);
             else
-                    fprintf (stderr, "patricia_search_best: take right at %d\n",
+                    fprintf (stderr, "patricia_search_all: take right at %d\n",
                  node->bit);
 #endif /* PATRICIA_DEBUG */
             node = node->r;
@@ -713,10 +713,10 @@ patricia_search_all (patricia_tree_t *patricia, prefix_t *prefix,
         else {
 #ifdef PATRICIA_DEBUG
             if (node->prefix)
-                    fprintf (stderr, "patricia_search_best: take left %s/%d\n",
+                    fprintf (stderr, "patricia_search_all: take left %s/%d\n",
                          prefix_toa (node->prefix), node->prefix->bitlen);
             else
-                    fprintf (stderr, "patricia_search_best: take left at %d\n",
+                    fprintf (stderr, "patricia_search_all: take left at %d\n",
                  node->bit);
 #endif /* PATRICIA_DEBUG */
             node = node->l;
@@ -731,12 +731,12 @@ patricia_search_all (patricia_tree_t *patricia, prefix_t *prefix,
 
 #ifdef PATRICIA_DEBUG
     if (node == NULL)
-        fprintf (stderr, "patricia_search_best: stop at null\n");
+        fprintf (stderr, "patricia_search_all: stop at null\n");
     else if (node->prefix)
-        fprintf (stderr, "patricia_search_best: stop at %s/%d\n",
+        fprintf (stderr, "patricia_search_all: stop at %s/%d\n",
              prefix_toa (node->prefix), node->prefix->bitlen);
     else
-        fprintf (stderr, "patricia_search_best: stop at %d\n", node->bit);
+        fprintf (stderr, "patricia_search_all: stop at %d\n", node->bit);
 #endif /* PATRICIA_DEBUG */
 
     if (cnt <= 0)
@@ -745,14 +745,14 @@ patricia_search_all (patricia_tree_t *patricia, prefix_t *prefix,
     while (--cnt >= 0) {
         node = nodes[cnt];
 #ifdef PATRICIA_DEBUG
-            fprintf (stderr, "patricia_search_best: pop %s/%d\n",
+            fprintf (stderr, "patricia_search_all: pop %s/%d\n",
                  prefix_toa (node->prefix), node->prefix->bitlen);
 #endif /* PATRICIA_DEBUG */
         if (comp_with_mask (prefix_tochar (node->prefix),
                     prefix_tochar (prefix),
                     node->prefix->bitlen)) {
 #ifdef PATRICIA_DEBUG
-                fprintf (stderr, "patricia_search_best: found %s/%d\n",
+                fprintf (stderr, "patricia_search_all: found %s/%d\n",
                      prefix_toa (node->prefix), node->prefix->bitlen);
 #endif /* PATRICIA_DEBUG */
             return (cnt +1);
