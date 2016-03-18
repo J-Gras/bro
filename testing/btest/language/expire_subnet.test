@@ -34,14 +34,21 @@ function execute_test()
 	local num_b = nums[3];
 
 	local net_a = nets[192.168.2.0/24];
-	local net_b = nets[192.168.3.0/24];
+	#local net_b = nets[192.168.3.0/24];
+	local nets_b = "";
+	local nets_b_tbl: table[subnet] of string;
+
+	nets_b_tbl = lookup_all(nets, 192.168.3.0/24);
+	for ( idx in nets_b_tbl )
+		nets_b += cat(", ", nets_b_tbl[idx]);
+	nets_b = nets_b[2:];
 	
 	# writing resets expire as expected
 	#nets[192.168.2.0/24] = "accessed";
 	#nets[192.168.3.0/24] = "accessed";
 
-	print fmt("Accessed table nums: %s, %s", num_a, num_b);
-	print fmt("Accessed table nets: %s, %s", net_a, net_b);
+	print fmt("Accessed table nums: %s; %s", num_a, num_b);
+	print fmt("Accessed table nets: %s; %s", net_a, nets_b);
 	print fmt("Time: %s", time_past());
 	print "";
 	}
@@ -58,7 +65,7 @@ event bro_init()
 	nums[3] = "three";
 	nums[4] = "four";
 
-	nets[192.168.0.0/24] = "zero";
+	nets[192.168.0.0/16] = "zero";
 	nets[192.168.1.0/24] = "one";
 	nets[192.168.2.0/24] = "two";
 	nets[192.168.3.0/24] = "three";

@@ -1832,7 +1832,7 @@ TableVal* TableVal::LookupAll(Val* index)
 	{
 	if ( subnets )
 		{
-		TableVal* result = new TableVal(table_type);
+		TableVal* result = new TableVal(this->Type()->Ref()->AsTableType());
 		Val* idx;
 		void* data;
 
@@ -1842,8 +1842,7 @@ TableVal* TableVal::LookupAll(Val* index)
 			TableEntryVal* v = (TableEntryVal*) data;
 			if ( v )
 				UpdateReadExpire(index, v);
-			// TODO: copy value?
-			result->Assign(idx, v ? v->Value() : NULL);
+			result->Assign(idx, v ? v->Value()->Ref() : NULL);
 			}
 		delete i;
 
