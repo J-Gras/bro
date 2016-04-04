@@ -133,6 +133,13 @@ export {
 		sources:  set[string]    &log &default=string_set();
 	};
 
+	## False positive rate of the bloomfilter used to match IPs.
+	const bloomfilter_fp = 0.001 &redef;
+
+	## Maximum number of IPs for which the given false positive
+	## rate will be guaranteed.
+	const bloomfilter_capacity = 1000000;
+
 	## Intelligence data manipulation function.
 	global insert: function(item: Item);
 
@@ -183,7 +190,7 @@ global data_store: DataStore &redef;
 # This is primarily for workers to do the initial quick matches and store
 # a minimal amount of data for the full match to happen on the manager.
 type MinDataStore: record {
-	host_data:    set[addr];
+	host_data:    opaque of bloomfilter;
 	subnet_data:  set[subnet];
 	string_data:  set[string, Type];
 };
@@ -192,6 +199,8 @@ global min_data_store: MinDataStore &redef;
 
 event bro_init() &priority=5
 	{
+	min_data_store$host_data = bloomfilter_basic_init(bloomfilter_fp, bloomfilter_capacity);
+
 	Log::create_stream(LOG, [$columns=Info, $ev=log_intel, $path="intel"]);
 	}
 
@@ -201,7 +210,9 @@ function find(s: Seen): bool
 
 	if ( s?$host )
 		{
-		return ((s$host in ds$host_data) ||
+		local host_match = have_full_data ? (s$host in ds$host_data) :
+			(bloomfilter_lookup(min_data_store$host_data, s$host) > 0);
+		return ( host_match ||
 		        (|matching_subnets(addr_to_subnet(s$host), ds$subnet_data)| > 0));
 		}
 	else
@@ -350,7 +361,7 @@ function insert(item: Item)
 			meta_tbl = data_store$host_data[host];
 			}
 
-		add min_data_store$host_data[host];
+		bloomfilter_add(min_data_store$host_data, host);
 		}
 	else if ( item$indicator_type == SUBNET )
 		{
@@ -460,8 +471,7 @@ event purge_item(item: Item)
 	switch ( item$indicator_type )
 		{
 		case ADDR:
-			local host = to_addr(item$indicator);
-			delete min_data_store$host_data[host];
+			# Currently there is no delete for bloomfilter
 			break;
 		case SUBNET:
 			local net = to_subnet(item$indicator);
