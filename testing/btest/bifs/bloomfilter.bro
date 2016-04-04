@@ -14,6 +14,7 @@ function test_basic_bloom_filter()
   print bloomfilter_lookup(bf_cnt, 336);
   bloomfilter_add(bf_cnt, 0.5); # Type mismatch
   bloomfilter_add(bf_cnt, "foo"); # Type mismatch
+  bloomfilter_remove(bf_cnt, 42); # Invalid method
 
   # Alternative constructor.
   local bf_dbl = bloomfilter_basic_init2(4, 10);
@@ -86,6 +87,14 @@ function test_counting_bloom_filter()
   print bloomfilter_lookup(bf_merged, "foo");
   print bloomfilter_lookup(bf_merged, "bar");
   print bloomfilter_lookup(bf_merged, "baz");
+
+  # Removing
+  print fmt("remove bar: %s", bloomfilter_remove(bf, "bar"));
+  print bloomfilter_lookup(bf, "bar");    # 1
+  print fmt("remove bar: %s", bloomfilter_remove(bf, "bar"));
+  print bloomfilter_lookup(bf, "bar");    # 0
+  print fmt("remove bar: %s", bloomfilter_remove(bf, "bar"));
+  print bloomfilter_lookup(bf, "bar");    # still 0
   }
 
 event bro_init()

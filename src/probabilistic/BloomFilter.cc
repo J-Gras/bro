@@ -272,3 +272,16 @@ size_t CountingBloomFilter::Count(const HashKey* key) const
 
 	return min;
 	}
+
+bool CountingBloomFilter::Remove(const HashKey* key)
+	{
+	if ( ! Count(key) )
+		return false;
+
+	Hasher::digest_vector h = hasher->Hash(key);
+
+	for ( size_t i = 0; i < h.size(); ++i )
+		cells->Decrement(h[i] % cells->Size());
+
+	return true;
+	}

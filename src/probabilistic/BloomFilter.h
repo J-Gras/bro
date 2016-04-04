@@ -202,6 +202,13 @@ public:
 	 */
 	~CountingBloomFilter();
 
+	/**
+	 * Removes an element from the Bloom filter.
+	 *
+	 * @param key The key associated with the element to remove.
+	 */
+	virtual bool Remove(const HashKey* key);
+
 	// Overridden from BloomFilter.
 	virtual bool Empty() const override;
 	virtual void Clear() override;

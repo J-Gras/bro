@@ -158,6 +158,32 @@ function bloomfilter_add%(bf: opaque of bloomfilter, x: any%): any
 	return 0;
 	%}
 
+## Removes an element from a counting Bloom filter (i.e. decrements the counter).
+##
+## bf: The counting Bloom filter handle.
+##
+## x: The element to remove.
+##
+## Returns: A bool indicating whether removing succeeded.
+##
+## .. bro:see:: bloomfilter_counting_init bloomfilter_add bloomfilter_lookup
+##    bloomfilter_clear bloomfilter_merge
+function bloomfilter_remove%(bf: opaque of bloomfilter, x: any%): any
+	%{
+	BloomFilterVal* bfv = static_cast<BloomFilterVal*>(bf);
+
+	if ( ! bfv->Type() && ! bfv->Typify(x->Type()) )
+		reporter->Error("failed to set Bloom filter type");
+
+	else if ( ! same_type(bfv->Type(), x->Type()) )
+		reporter->Error("incompatible Bloom filter types");
+
+	else
+		return new Val(bfv->Remove(x), TYPE_BOOL);
+
+	return new Val(false, TYPE_BOOL);
+	%}
+
 ## Retrieves the counter for a given element in a Bloom filter.
 ##
 ## bf: The Bloom filter handle.

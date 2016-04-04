@@ -123,6 +123,7 @@ public:
 	bool Typify(BroType* type);
 
 	void Add(const Val* val);
+	bool Remove(const Val* val);
 	size_t Count(const Val* val) const;
 	void Clear();
 	bool Empty() const;

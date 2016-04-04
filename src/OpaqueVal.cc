@@ -572,6 +572,23 @@ void BloomFilterVal::Add(const Val* val)
 	delete key;
 	}
 
+bool BloomFilterVal::Remove(const Val* val)
+	{
+	probabilistic::CountingBloomFilter* cnt_bloom_filter =
+		dynamic_cast<probabilistic::CountingBloomFilter*>(bloom_filter);
+
+	if ( ! cnt_bloom_filter )
+		{
+		reporter->Error("this Bloom filter does not support the remove operation");
+		return false;
+		}
+
+	HashKey* key = hash->ComputeHash(val, 1);
+	bool res = cnt_bloom_filter->Remove(key);
+	delete key;
+	return res;
+	}
+
 size_t BloomFilterVal::Count(const Val* val) const
 	{
 	HashKey* key = hash->ComputeHash(val, 1);
