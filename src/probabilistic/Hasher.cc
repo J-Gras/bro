@@ -157,7 +157,7 @@ bool DefaultHasher::DoUnserialize(UnserialInfo* info)
 	DO_UNSERIALIZE(Hasher);
 
 	hash_functions.clear();
-	for ( size_t i = 0; i < K(); ++i )
+	for ( size_t i = 1; i <= K(); ++i )
 		hash_functions.push_back(UHF(Seed() + bro_prng(i)));
 
 	return true;
