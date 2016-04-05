@@ -199,7 +199,10 @@ global min_data_store: MinDataStore &redef;
 
 event bro_init() &priority=5
 	{
-	min_data_store$host_data = bloomfilter_basic_init(bloomfilter_fp, bloomfilter_capacity);
+	# Initialize counting bloom filter using 3 bit counters to allow removing items
+	local m = double_to_count(-(bloomfilter_capacity * ln(bloomfilter_fp))/(ln(2) * ln(2)));
+	local k = double_to_count((m/bloomfilter_capacity) * ln(2));
+	min_data_store$host_data = bloomfilter_counting_init(k, m, 7);
 
 	Log::create_stream(LOG, [$columns=Info, $ev=log_intel, $path="intel"]);
 	}
@@ -212,6 +215,7 @@ function find(s: Seen): bool
 		{
 		local host_match = have_full_data ? (s$host in ds$host_data) :
 			(bloomfilter_lookup(min_data_store$host_data, s$host) > 0);
+
 		return ( host_match ||
 		        (|matching_subnets(addr_to_subnet(s$host), ds$subnet_data)| > 0));
 		}
@@ -471,7 +475,8 @@ event purge_item(item: Item)
 	switch ( item$indicator_type )
 		{
 		case ADDR:
-			# Currently there is no delete for bloomfilter
+			local host = to_addr(item$indicator);
+			bloomfilter_remove(min_data_store$host_data, host);
 			break;
 		case SUBNET:
 			local net = to_subnet(item$indicator);
