@@ -164,6 +164,17 @@ public:
 	uint32 hdr_size;
 
 	/**
+	 * Layer 2 source address. Valid iff Layer2Valid() returns true.
+	 */
+	const u_char* l2_src;
+
+	/**
+	 * Layer 2 destination address. Valid iff Layer2Valid() returns
+	 * true.
+	 */
+	const u_char* l2_dst;
+
+	/**
 	 * Layer 3 protocol identified (if any). Valid iff Layer2Valid()
 	 * returns true.
 	 */

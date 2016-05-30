@@ -329,6 +329,8 @@ type endpoint: record {
 	## The current IPv6 flow label that the connection endpoint is using.
 	## Always 0 if the connection is over IPv4.
 	flow_label: count;
+	## The link-layer address seen in the first packet (if available).
+	l2_addr: string &optional;
 };
 
 ## A connection. This is Bro's basic connection type describing IP- and

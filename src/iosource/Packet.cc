@@ -40,6 +40,8 @@ void Packet::Init(int arg_link_type, struct timeval *arg_ts, uint32 arg_caplen,
 
 	time = ts.tv_sec + double(ts.tv_usec) / 1e6;
 	hdr_size = GetLinkHeaderSize(arg_link_type);
+	l2_src = 0;
+	l2_dst = 0;
 	l3_proto = L3_UNKNOWN;
 	eth_type = 0;
 	vlan = 0;
@@ -134,6 +136,9 @@ void Packet::ProcessLayer2()
 
 	case DLT_EN10MB:
 		{
+		// Set source and destination address
+		l2_dst = pdata;
+		l2_src = pdata + 6;
 		// Get protocol being carried from the ethernet frame.
 		int protocol = (pdata[12] << 8) + pdata[13];
 		pdata += GetLinkHeaderSize(link_type);
