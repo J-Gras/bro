@@ -328,6 +328,7 @@ set(bro_SRCS
     strsep.c
     modp_numtoa.c
     siphash24.c
+    xxhash.c
 
     threading/BasicThread.cc
     threading/Formatter.cc
