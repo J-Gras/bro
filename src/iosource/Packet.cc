@@ -141,6 +141,7 @@ void Packet::ProcessLayer2()
 	const u_char* end_of_data = data + cap_len;
 
 	switch ( link_type ) {
+    case DLT_NULL:
 		{
 		int protocol = (pdata[3] << 24) + (pdata[2] << 16) + (pdata[1] << 8) + pdata[0];
 		pdata += GetLinkHeaderSize(link_type);
