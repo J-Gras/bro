@@ -33,6 +33,9 @@
 #include "iosource/IOSource.h"
 #include "iosource/PktDumper.h"
 
+// LLPOC
+#include "llanalyzer/Timing.h"
+
 // These represent NetBIOS services on ephemeral ports.  They're numbered
 // so that we can use a single int to hold either an actual TCP/UDP server
 // port or one of these.
@@ -122,7 +125,7 @@ void NetSessions::Done()
 void NetSessions::NextPacket(double t, const Packet* pkt)
 	{
 	SegmentProfiler prof(segment_logger, "dispatching-packet");
-    DBG_LOG(DBG_LLPOC, "[LAYER 3] Next packet with ts=%f has layer 3 protocol %d", pkt->time, pkt->l3_proto);
+//    DBG_LOG(DBG_LLPOC, "[LAYER 3] Next packet with ts=%f has layer 3 protocol %d", pkt->time, pkt->l3_proto);
 
 	if ( raw_packet )
 		mgr.Enqueue(raw_packet, pkt->ToRawPktHdrVal());
@@ -140,17 +143,17 @@ void NetSessions::NextPacket(double t, const Packet* pkt)
 	if ( pkt->hdr_size > pkt->cap_len )
 		{
 		Weird("truncated_link_frame", pkt);
-		return;
+        return;
 		}
 
 	uint32_t caplen = pkt->cap_len - pkt->hdr_size;
 
-	if ( pkt->l3_proto == L3_IPV4 )
+    if ( pkt->l3_proto == L3_IPV4 )
 		{
 		if ( caplen < sizeof(struct ip) )
 			{
 			Weird("truncated_IP", pkt);
-			return;
+            return;
 			}
 
 		const struct ip* ip = (const struct ip*) (pkt->data + pkt->hdr_size);
@@ -163,7 +166,7 @@ void NetSessions::NextPacket(double t, const Packet* pkt)
 		if ( caplen < sizeof(struct ip6_hdr) )
 			{
 			Weird("truncated_IP", pkt);
-			return;
+            return;
 			}
 
 		IP_Hdr ip_hdr((const struct ip6_hdr*) (pkt->data + pkt->hdr_size), false, caplen);
@@ -173,15 +176,14 @@ void NetSessions::NextPacket(double t, const Packet* pkt)
 	else if ( pkt->l3_proto == L3_ARP )
 		{
 		if ( arp_analyzer )
-			arp_analyzer->NextPacket(t, pkt);
-		}
+            arp_analyzer->NextPacket(t, pkt);
+        }
 
 	else
 		{
 		Weird("unknown_packet_type", pkt);
-		return;
+        return;
 		}
-
 
 	if ( dump_this_packet && ! record_all_packets )
 		DumpPacket(pkt);
@@ -215,7 +217,7 @@ static unsigned int gre_header_len(uint16_t flags)
 void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr,
 			       const EncapsulationStack* encapsulation)
 	{
-    DBG_LOG(DBG_LLPOC, "[LAYER 4] Next packet with ts=%f contains protocol %d", pkt->time, (int) ip_hdr->NextProto());
+//    DBG_LOG(DBG_LLPOC, "[LAYER 4] Next packet with ts=%f contains protocol %d", pkt->time, (int) ip_hdr->NextProto());
 
     uint32_t caplen = pkt->cap_len - pkt->hdr_size;
 	const struct ip* ip4 = ip_hdr->IP4_Hdr();
@@ -361,7 +363,7 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 #endif
 	int proto = ip_hdr->NextProto();
 
-	if ( CheckHeaderTrunc(proto, len, caplen, pkt, encapsulation) )
+    if ( CheckHeaderTrunc(proto, len, caplen, pkt, encapsulation) )
 		return;
 
 	const u_char* data = ip_hdr->Payload();
@@ -374,10 +376,10 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 	int gre_version = -1;
 	int gre_link_type = DLT_RAW;
 
-	switch ( proto ) {
+    switch ( proto ) {
 	case IPPROTO_TCP:
 		{
-		const struct tcphdr* tp = (const struct tcphdr *) data;
+        const struct tcphdr* tp = (const struct tcphdr *) data;
 		id.src_port = tp->th_sport;
 		id.dst_port = tp->th_dport;
 		id.is_one_way = false;
@@ -387,8 +389,8 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 
 	case IPPROTO_UDP:
 		{
-		const struct udphdr* up = (const struct udphdr *) data;
-		id.src_port = up->uh_sport;
+        const struct udphdr* up = (const struct udphdr *) data;
+        id.src_port = up->uh_sport;
 		id.dst_port = up->uh_dport;
 		id.is_one_way = false;
 		d = &udp_conns;
@@ -397,7 +399,7 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 
 	case IPPROTO_ICMP:
 		{
-		const struct icmp* icmpp = (const struct icmp *) data;
+        const struct icmp* icmpp = (const struct icmp *) data;
 
 		id.src_port = icmpp->icmp_type;
 		id.dst_port = analyzer::icmp::ICMP4_counterpart(icmpp->icmp_type,
@@ -413,7 +415,7 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 
 	case IPPROTO_ICMPV6:
 		{
-		const struct icmp* icmpp = (const struct icmp *) data;
+        const struct icmp* icmpp = (const struct icmp *) data;
 
 		id.src_port = icmpp->icmp_type;
 		id.dst_port = analyzer::icmp::ICMP6_counterpart(icmpp->icmp_type,
@@ -647,7 +649,7 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 
 	case IPPROTO_NONE:
 		{
-		// If the packet is encapsulated in Teredo, then it was a bubble and
+        // If the packet is encapsulated in Teredo, then it was a bubble and
 		// the Teredo analyzer may have raised an event for that, else we're
 		// not sure the reason for the No Next header in the packet.
 		if ( ! ( encapsulation &&
@@ -658,11 +660,12 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 		}
 
 	default:
-		Weird("unknown_protocol", pkt, encapsulation, fmt("%d", proto));
+        Weird("unknown_protocol", pkt, encapsulation, fmt("%d", proto));
 		return;
 	}
 
-	ConnIDKey key = BuildConnIDKey(id);
+
+    ConnIDKey key = BuildConnIDKey(id);
 	Connection* conn = nullptr;
 
 	// FIXME: The following is getting pretty complex. Need to split up
