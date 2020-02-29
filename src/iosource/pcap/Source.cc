@@ -196,8 +196,6 @@ void PcapSource::OpenOffline()
 
 bool PcapSource::ExtractNextPacket(Packet* pkt)
 	{
-    static size_t time_taken = 0;
-
     if ( ! pd )
 		return false;
 
