@@ -28,7 +28,7 @@ void Manager::InitPostScript() {
 
     // Configuration Mockup
     Config configuration;
-    configuration.addMapping("ROOT", 0x1, "ETHERNET");
+    configuration.addMapping("ROOT", 0x1, "WrapperAnalyzer");
 //    configuration.addMapping("ETHERNET", 0x800, "IP4");
 //    configuration.addMapping("ETHERNET", 0x86DD, "IP6");
 //    configuration.addMapping("ETHERNET", 0x806, "ARP");

@@ -6,8 +6,9 @@ include_directories(BEFORE
                     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-file(GLOB_RECURSE disp_SRCS dispatchers/*.cc)
+add_subdirectory(protocol)
 
+file(GLOB_RECURSE disp_SRCS dispatchers/*.cc)
 set(llanalyzer_SRCS
     Analyzer.cc
     ProtocolAnalyzerSet.cc
