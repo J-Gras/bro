@@ -1,5 +1,9 @@
 // See the file "COPYING" in the main distribution directory for copyright.
 
+extern "C" {
+#include <pcap.h>
+}
+
 #include <list>
 
 #include "Config.h"
@@ -28,7 +32,13 @@ void Manager::InitPostScript() {
 
     // Configuration Mockup
     Config configuration;
-    configuration.addMapping("ROOT", 0x1, "WrapperAnalyzer");
+    //configuration.addMapping("ROOT", DLT_EN10MB, "WrapperAnalyzer");
+    configuration.addMapping("ROOT", DLT_EN10MB, "EthernetAnalyzer");
+    configuration.addMapping("ROOT", DLT_PPP_SERIAL, "PPPSerialAnalyzer");
+    configuration.addMapping("ROOT", DLT_IEEE802_11, "IEEE802_11Analyzer");
+    configuration.addMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
+    configuration.addMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
+    configuration.addMapping("IEEE802_11_RadioAnalyzer", DLT_IEEE802_11, "IEEE802_11Analyzer");
 //    configuration.addMapping("ETHERNET", 0x800, "IP4");
 //    configuration.addMapping("ETHERNET", 0x86DD, "IP6");
 //    configuration.addMapping("ETHERNET", 0x806, "ARP");
@@ -178,7 +188,9 @@ void Manager::processPacket(Packet* packet) {
     static size_t counter = 0;
     DBG_LOG(DBG_LLPOC, "Analyzing packet %ld, ts=%.3f...", ++counter, packet->time);
 #endif
-    // Dispatch and analyze layers unitl getIdentifier returns -1 --> end of packet reached
+    //TODO: What about blanket encapsulation by encap_hdr_size?
+
+    // Dispatch and analyze layers until getIdentifier returns -1 --> end of packet reached
     identifier_t nextLayerID = packet->link_type;
     do {
         Analyzer* currentAnalyzer = analyzerSet->dispatch(nextLayerID);
@@ -188,11 +200,11 @@ void Manager::processPacket(Packet* packet) {
             break;
         }
 
-        // Get identifier of next layer protocol
-        nextLayerID = currentAnalyzer->getIdentifier(packet);
-
         // Analyze this layer
         currentAnalyzer->analyze(packet);
+
+        // Get identifier of next layer protocol
+        nextLayerID = currentAnalyzer->getIdentifier(packet);
     } while (nextLayerID != NO_NEXT_LAYER);
 
     // Processing finished, reset analyzer set state for next packet

@@ -1,1 +1,6 @@
 add_subdirectory(wrapper)
+add_subdirectory(ethernet)
+add_subdirectory(ppp_serial)
+add_subdirectory(ieee802_11)
+add_subdirectory(ieee802_11_radio)
+add_subdirectory(nflog)
