@@ -5,3 +5,7 @@ add_subdirectory(ppp_serial)
 add_subdirectory(ieee802_11)
 add_subdirectory(ieee802_11_radio)
 add_subdirectory(nflog)
+add_subdirectory(mpls)
+
+add_subdirectory(ipv4)
+add_subdirectory(ipv6)

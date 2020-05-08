@@ -35,6 +35,9 @@ void Manager::InitPostScript() {
     configuration.addMapping("ROOT", DLT_IEEE802_11, "IEEE802_11Analyzer");
     configuration.addMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
     configuration.addMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
+
+    configuration.addMapping("EthernetAnalyzer", 0x8847, "MPLSAnalyzer");
+    configuration.addMapping("PPPSerialAnalyzer", 0x0281, "MPLSAnalyzer");
     configuration.addMapping("IEEE802_11_RadioAnalyzer", DLT_IEEE802_11, "IEEE802_11Analyzer");
 //    configuration.addMapping("ETHERNET", 0x800, "IP4");
 //    configuration.addMapping("ETHERNET", 0x86DD, "IP6");

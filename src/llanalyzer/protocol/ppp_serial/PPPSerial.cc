@@ -8,12 +8,7 @@ PPPSerialAnalyzer::PPPSerialAnalyzer() : llanalyzer::Analyzer("PPPSerialAnalyzer
 PPPSerialAnalyzer::~PPPSerialAnalyzer() = default;
 
 llanalyzer::identifier_t PPPSerialAnalyzer::analyze(Packet* packet) {
-    // Unfortunately some packets on the link might have MPLS labels
-    // while others don't. That means we need to ask the link-layer if
-    // labels are in place.
-    bool have_mpls = false;
-
-    auto pdata = packet->cur_pos;
+    auto& pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
     pdata += Packet::GetLinkHeaderSize(packet->link_type);
@@ -23,9 +18,7 @@ llanalyzer::identifier_t PPPSerialAnalyzer::analyze(Packet* packet) {
 
     if ( protocol == 0x0281 )
     {
-        // MPLS Unicast. Remove the pdata link layer and
-        // denote a header size of zero before the IP header.
-        have_mpls = true;
+        return protocol;
     }
     else if ( protocol == 0x0021 )
         packet->l3_proto = L3_IPV4;
@@ -38,41 +31,7 @@ llanalyzer::identifier_t PPPSerialAnalyzer::analyze(Packet* packet) {
         return NO_NEXT_LAYER;
         }
 
-    if (have_mpls) {
-        // Skip the MPLS label stack.
-        bool end_of_stack = false;
-
-        while (!end_of_stack) {
-            if (pdata + 4 >= end_of_data) {
-                packet->Weird("truncated_link_header");
-                return NO_NEXT_LAYER;
-            }
-
-            end_of_stack = *(pdata + 2u) & 0x01;
-            pdata += 4;
-        }
-
-        // We assume that what remains is IP
-        if (pdata + sizeof(struct ip) >= end_of_data) {
-            packet->Weird("no_ip_in_mpls_payload");
-            return NO_NEXT_LAYER;
-        }
-
-        const struct ip *ip = (const struct ip *) pdata;
-
-        if (ip->ip_v == 4)
-            packet->l3_proto = L3_IPV4;
-        else if (ip->ip_v == 6)
-            packet->l3_proto = L3_IPV6;
-        else {
-            // Neither IPv4 nor IPv6.
-            packet->Weird("no_ip_in_mpls_payload");
-            return NO_NEXT_LAYER;
-        }
-    }
-
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
-
-    return protocol;
+    return NO_NEXT_LAYER;
 }
