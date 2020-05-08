@@ -128,6 +128,11 @@ int Packet::GetLinkHeaderSize(int link_type)
 	return -1;
 	}
 
+const u_char* const Packet::GetEndOfData() const
+	{
+	return data + cap_len;
+	}
+
 void Packet::ProcessLayer2()
 	{
 	l2_valid = true;

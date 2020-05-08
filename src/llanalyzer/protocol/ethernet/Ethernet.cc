@@ -26,8 +26,8 @@ void EthernetAnalyzer::analyze(Packet* packet) {
     // labels are in place.
     bool have_mpls = false;
 
-    const u_char *pdata = packet->data;
-    const u_char *end_of_data = packet->data + packet->cap_len;
+    auto pdata = packet->cur_pos;
+    auto end_of_data = packet->GetEndOfData();
 
     // Skip past Cisco FabricPath to encapsulated ethernet frame.
     if (pdata[12] == 0x89 && pdata[13] == 0x03) {

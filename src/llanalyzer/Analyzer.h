@@ -53,8 +53,7 @@ public:
 	 */
 	bool IsAnalyzer(const char* name);
 
-	virtual identifier_t getIdentifier(Packet *packet) = 0;
-	virtual void analyze(Packet *packet) = 0;
+	virtual identifier_t analyze(Packet *packet) = 0;
 
 protected:
 	friend class Manager;

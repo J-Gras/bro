@@ -21,8 +21,8 @@ void IEEE802_11_RadioAnalyzer::analyze(Packet* packet) {
         getIdentifier(packet);
     }
 
-    const u_char *pdata = packet->data;
-    const u_char *end_of_data = packet->data + packet->cap_len;
+    auto pdata = packet->cur_pos;
+    auto end_of_data = packet->GetEndOfData();
 
     if ( pdata + 3 >= end_of_data )
     {

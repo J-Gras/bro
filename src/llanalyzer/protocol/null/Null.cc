@@ -21,8 +21,8 @@ void NullAnalyzer::analyze(Packet* packet) {
     if (currentPacket != packet) {
         getIdentifier(packet);
     }
-    const u_char *pdata = packet->data;
-    const u_char *end_of_data = packet->data + packet->cap_len;
+    auto pdata = packet->cur_pos;
+    auto end_of_data = packet->GetEndOfData();
 
     int protocol = (pdata[3] << 24) + (pdata[2] << 16) + (pdata[1] << 8) + pdata[0];
     pdata += Packet::GetLinkHeaderSize(packet->link_type);

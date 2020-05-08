@@ -144,6 +144,13 @@ public:
 	static int GetLinkHeaderSize(int link_type);
 
 	/**
+	 * Returns the end of the captured data for bound checking.
+	 *
+	 * @return End of the packet data.
+	 */
+	const u_char* const GetEndOfData() const;
+
+	/**
 	 * Describes the packet, with standard signature.
 	 */
 	void Describe(ODesc* d) const;
@@ -159,7 +166,7 @@ public:
 	pkt_timeval ts;			/// Capture timestamp
 	const u_char* data;		/// Packet data.
 	uint32_t len;			/// Actual length on wire
-	uint32_t cap_len;			/// Captured packet length
+	uint32_t cap_len;		/// Captured packet length
 	uint32_t link_type;		/// pcap link_type (DLT_EN10MB, DLT_RAW, etc)
     const uint8_t* cur_pos; /// Current pointer to the start of unanalyzed payload data in the raw packet, used by llanalyzers
 

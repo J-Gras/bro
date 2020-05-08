@@ -26,8 +26,8 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
     // labels are in place.
     bool have_mpls = false;
 
-    const u_char *pdata = packet->data;
-    const u_char *end_of_data = packet->data + packet->cap_len;
+    auto pdata = packet->cur_pos;
+    auto end_of_data = packet->GetEndOfData();
 
     pdata += Packet::GetLinkHeaderSize(packet->link_type);
 

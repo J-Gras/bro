@@ -21,8 +21,8 @@ void NFLogAnalyzer::analyze(Packet* packet) {
         getIdentifier(packet);
     }
 
-    const u_char *pdata = packet->data;
-    const u_char *end_of_data = packet->data + packet->cap_len;
+    auto pdata = packet->cur_pos;
+    auto end_of_data = packet->GetEndOfData();
 
     // See https://www.tcpdump.org/linktypes/LINKTYPE_NFLOG.html
 

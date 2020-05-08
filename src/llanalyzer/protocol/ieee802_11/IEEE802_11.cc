@@ -20,8 +20,8 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
     if (currentPacket != packet) {
         getIdentifier(packet);
     }
-    const u_char *pdata = packet->cur_pos;
-    const u_char *end_of_data = packet->data + packet->cap_len;
+    auto pdata = packet->cur_pos;
+    auto end_of_data = packet->GetEndOfData();
 
     u_char len_80211 = 24; // minimal length of data frames
 
