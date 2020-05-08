@@ -3,24 +3,11 @@
 
 using namespace llanalyzer::PPPSerial;
 
-PPPSerialAnalyzer::PPPSerialAnalyzer() : llanalyzer::Analyzer("PPPSerialAnalyzer"), protocol(0), currentPacket(nullptr) {
-}
+PPPSerialAnalyzer::PPPSerialAnalyzer() : llanalyzer::Analyzer("PPPSerialAnalyzer") { }
 
 PPPSerialAnalyzer::~PPPSerialAnalyzer() = default;
 
-uint32_t PPPSerialAnalyzer::getIdentifier(Packet* packet) {
-    currentPacket = packet;
-
-    // Extract protocol identifier
-    protocol = (packet->cur_pos[2] << 8) + packet->cur_pos[3];
-    return protocol;
-}
-
-void PPPSerialAnalyzer::analyze(Packet* packet) {
-    if (currentPacket != packet) {
-        getIdentifier(packet);
-    }
-
+llanalyzer::identifier_t PPPSerialAnalyzer::analyze(Packet* packet) {
     // Unfortunately some packets on the link might have MPLS labels
     // while others don't. That means we need to ask the link-layer if
     // labels are in place.
@@ -30,6 +17,9 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
     auto end_of_data = packet->GetEndOfData();
 
     pdata += Packet::GetLinkHeaderSize(packet->link_type);
+
+    // Extract protocol identifier
+    identifier_t protocol = (pdata[2] << 8) + pdata[3];
 
     if ( protocol == 0x0281 )
     {
@@ -45,7 +35,7 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
         {
         // Neither IPv4 nor IPv6.
         packet->Weird("non_ip_packet_in_ppp_encapsulation");
-        return;
+        return NO_NEXT_LAYER;
         }
 
     if (have_mpls) {
@@ -55,7 +45,7 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
         while (!end_of_stack) {
             if (pdata + 4 >= end_of_data) {
                 packet->Weird("truncated_link_header");
-                return;
+                return NO_NEXT_LAYER;
             }
 
             end_of_stack = *(pdata + 2u) & 0x01;
@@ -65,7 +55,7 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
         // We assume that what remains is IP
         if (pdata + sizeof(struct ip) >= end_of_data) {
             packet->Weird("no_ip_in_mpls_payload");
-            return;
+            return NO_NEXT_LAYER;
         }
 
         const struct ip *ip = (const struct ip *) pdata;
@@ -77,13 +67,13 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("no_ip_in_mpls_payload");
-            return;
+            return NO_NEXT_LAYER;
         }
     } else if (encap_hdr_size) {
         // Blanket encapsulation. We assume that what remains is IP.
         if (pdata + encap_hdr_size + sizeof(struct ip) >= end_of_data) {
             packet->Weird("no_ip_left_after_encap");
-            return;
+            return NO_NEXT_LAYER;
         }
 
         pdata += encap_hdr_size;
@@ -97,17 +87,13 @@ void PPPSerialAnalyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("no_ip_in_encap");
-            return;
+            return NO_NEXT_LAYER;
         }
 
     }
 
-    // We've now determined (a) L3_IPV4 vs (b) L3_IPV6 vs (c) L3_ARP vs
-    // (d) L3_UNKNOWN.
-
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    protocol = 0;
-    currentPacket = nullptr;
+    return protocol;
 }

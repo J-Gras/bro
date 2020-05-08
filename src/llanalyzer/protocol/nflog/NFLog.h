@@ -10,16 +10,11 @@ public:
     NFLogAnalyzer();
     ~NFLogAnalyzer() override;
 
-    uint32_t getIdentifier(Packet* packet) override;
-    void analyze(Packet* packet) override;
+    identifier_t analyze(Packet* packet) override;
 
     static Analyzer* Instantiate() {
         return new NFLogAnalyzer();
     }
-
-private:
-    uint16_t protocol;
-    Packet* currentPacket;
 };
 
 } }

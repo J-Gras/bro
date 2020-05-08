@@ -3,28 +3,15 @@
 
 using namespace llanalyzer::Null;
 
-NullAnalyzer::NullAnalyzer() : llanalyzer::Analyzer("NullAnalyzer"), protocol(0), currentPacket(nullptr) {
-}
+NullAnalyzer::NullAnalyzer() : llanalyzer::Analyzer("NullAnalyzer") { }
 
 NullAnalyzer::~NullAnalyzer() = default;
 
-uint32_t NullAnalyzer::getIdentifier(Packet* packet) {
-    currentPacket = packet;
-
-    // Extract protocol identifier
-    protocol = (packet->cur_pos[3] << 24) + (packet->cur_pos[2] << 16) +
-            (packet->cur_pos[1] << 8) + packet->cur_pos[0];
-    return protocol;
-}
-
-void NullAnalyzer::analyze(Packet* packet) {
-    if (currentPacket != packet) {
-        getIdentifier(packet);
-    }
+llanalyzer::identifier_t NullAnalyzer::analyze(Packet* packet) {
     auto pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
-    int protocol = (pdata[3] << 24) + (pdata[2] << 16) + (pdata[1] << 8) + pdata[0];
+    identifier_t protocol = (pdata[3] << 24) + (pdata[2] << 16) + (pdata[1] << 8) + pdata[0];
     pdata += Packet::GetLinkHeaderSize(packet->link_type);
 
     // From the Wireshark Wiki: "AF_INET6, unfortunately, has
@@ -42,14 +29,14 @@ void NullAnalyzer::analyze(Packet* packet) {
     else
     {
         packet->Weird("non_ip_packet_in_null_transport");
-        return;
+        return NO_NEXT_LAYER;
     }
 
     if (encap_hdr_size) {
         // Blanket encapsulation. We assume that what remains is IP.
         if (pdata + encap_hdr_size + sizeof(struct ip) >= end_of_data) {
             packet->Weird("no_ip_left_after_encap");
-            return;
+            return NO_NEXT_LAYER;
         }
 
         pdata += encap_hdr_size;
@@ -63,18 +50,14 @@ void NullAnalyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("no_ip_in_encap");
-            return;
+            return NO_NEXT_LAYER;
         }
 
     }
 
-    // We've now determined (a) L3_IPV4 vs (b) L3_IPV6 vs (c) L3_ARP vs
-    // (d) L3_UNKNOWN.
-
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    protocol = 0;
-    currentPacket = nullptr;
+    return protocol;
 }
 

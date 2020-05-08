@@ -3,23 +3,11 @@
 
 using namespace llanalyzer::IEEE802_11;
 
-IEEE802_11Analyzer::IEEE802_11Analyzer() : llanalyzer::Analyzer("IEEE802_11Analyzer"), protocol(0), currentPacket(nullptr) {
-}
+IEEE802_11Analyzer::IEEE802_11Analyzer() : llanalyzer::Analyzer("IEEE802_11Analyzer") { }
 
 IEEE802_11Analyzer::~IEEE802_11Analyzer() = default;
 
-uint32_t IEEE802_11Analyzer::getIdentifier(Packet* packet) {
-    currentPacket = packet;
-
-    // Extract protocol identifier
-    //protocol = (packet->cur_pos[0] << 8) + packet->cur_pos[1];
-    return protocol;
-}
-
-void IEEE802_11Analyzer::analyze(Packet* packet) {
-    if (currentPacket != packet) {
-        getIdentifier(packet);
-    }
+llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
     auto pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
@@ -28,18 +16,18 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
     if ( pdata + len_80211 >= end_of_data )
     {
         packet->Weird("truncated_802_11_header");
-        return;
+        return NO_NEXT_LAYER;
     }
 
     u_char fc_80211 = pdata[0]; // Frame Control field
 
     // Skip non-data frame types (management & control).
     if ( ! ((fc_80211 >> 2) & 0x02) )
-        return;
+        return NO_NEXT_LAYER;
 
     // Skip subtypes without data.
     if ( (fc_80211 >> 4) & 0x04 )
-        return;
+        return NO_NEXT_LAYER;
 
     // 'To DS' and 'From DS' flags set indicate use of the 4th
     // address field.
@@ -52,7 +40,7 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
         // Skip in case of A-MSDU subframes indicated by QoS
         // control field.
         if ( pdata[len_80211] & 0x80)
-            return;
+            return NO_NEXT_LAYER;
 
         len_80211 += 2;
     }
@@ -60,7 +48,7 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
     if ( pdata + len_80211 >= end_of_data )
     {
         packet->Weird("truncated_802_11_header");
-        return;
+        return NO_NEXT_LAYER;
     }
 
     // Determine link-layer addresses based
@@ -93,7 +81,7 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
     if ( pdata + 8 >= end_of_data )
     {
         packet->Weird("truncated_802_11_header");
-        return;
+        return NO_NEXT_LAYER;
     }
     // Check that the DSAP and SSAP are both SNAP and that the control
     // field indicates that this is an unnumbered frame.
@@ -109,10 +97,10 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
         // If this is a logical link control frame without the
         // possibility of having a protocol we care about, we'll
         // just skip it for now.
-        return;
+        return NO_NEXT_LAYER;
     }
 
-    protocol = (pdata[0] << 8) + pdata[1];
+    identifier_t protocol = (pdata[0] << 8) + pdata[1];
     if ( protocol == 0x0800 )
         packet->l3_proto = L3_IPV4;
     else if ( protocol == 0x86DD )
@@ -122,7 +110,7 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
     else
     {
         packet->Weird("non_ip_packet_in_ieee802_11");
-        return;
+        return NO_NEXT_LAYER;
     }
     pdata += 2;
 
@@ -132,7 +120,7 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
         // Blanket encapsulation. We assume that what remains is IP.
         if (pdata + encap_hdr_size + sizeof(struct ip) >= end_of_data) {
             packet->Weird("no_ip_left_after_encap");
-            return;
+            return NO_NEXT_LAYER;
         }
 
         pdata += encap_hdr_size;
@@ -146,17 +134,13 @@ void IEEE802_11Analyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("no_ip_in_encap");
-            return;
+            return NO_NEXT_LAYER;
         }
 
     }
 
-    // We've now determined (a) L3_IPV4 vs (b) L3_IPV6 vs (c) L3_ARP vs
-    // (d) L3_UNKNOWN.
-
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    protocol = 0;
-    currentPacket = nullptr;
+    return protocol;
 }

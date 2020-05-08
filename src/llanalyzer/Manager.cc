@@ -200,11 +200,8 @@ void Manager::processPacket(Packet* packet) {
             break;
         }
 
-        // Analyze this layer
-        currentAnalyzer->analyze(packet);
-
-        // Get identifier of next layer protocol
-        nextLayerID = currentAnalyzer->getIdentifier(packet);
+        // Analyze this layer and get identifier of next layer protocol
+        nextLayerID = currentAnalyzer->analyze(packet);
     } while (nextLayerID != NO_NEXT_LAYER);
 
     // Processing finished, reset analyzer set state for next packet
