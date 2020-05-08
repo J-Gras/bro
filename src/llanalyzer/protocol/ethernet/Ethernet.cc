@@ -134,27 +134,6 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
             packet->Weird("no_ip_in_mpls_payload");
             return NO_NEXT_LAYER;
         }
-    } else if (encap_hdr_size) {
-        // Blanket encapsulation. We assume that what remains is IP.
-        if (pdata + encap_hdr_size + sizeof(struct ip) >= end_of_data) {
-            packet->Weird("no_ip_left_after_encap");
-            return NO_NEXT_LAYER;
-        }
-
-        pdata += encap_hdr_size;
-
-        const struct ip *ip = (const struct ip *) pdata;
-
-        if (ip->ip_v == 4)
-            packet->l3_proto = L3_IPV4;
-        else if (ip->ip_v == 6)
-            packet->l3_proto = L3_IPV6;
-        else {
-            // Neither IPv4 nor IPv6.
-            packet->Weird("no_ip_in_encap");
-            return NO_NEXT_LAYER;
-        }
-
     }
 
     // TODO: investigate how hdr_size is used

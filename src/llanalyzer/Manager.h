@@ -146,7 +146,21 @@ public:
 	 */
 	Analyzer* InstantiateAnalyzer(const std::string& name);
 
+	/**
+	 * Processes a packet by applying the configured low layer analyzers.
+	 *
+	 * @param packet The packet to process.
+	 */
 	void processPacket(Packet* packet);
+
+protected:
+    /**
+     * Skips a fixed amount of packet data that is defined by encap_hdr_size.
+     * It is assumed that an IP header follows.
+     *
+     * @param packet The packet to adapt.
+     */
+    void CustomEncapsulationSkip(Packet* packet);
 
 private:
     AnalyzerSet* analyzerSet;

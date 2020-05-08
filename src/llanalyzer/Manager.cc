@@ -1,16 +1,13 @@
 // See the file "COPYING" in the main distribution directory for copyright.
 
-extern "C" {
 #include <pcap.h>
-}
-
 #include <list>
 
-#include "Config.h"
 #include "Manager.h"
+#include "Config.h"
 #include "ProtocolAnalyzerSet.h"
-
 #include "plugin/Manager.h"
+#include "NetVar.h"
 
 using namespace llanalyzer;
 
@@ -204,6 +201,8 @@ void Manager::processPacket(Packet* packet) {
         nextLayerID = currentAnalyzer->analyze(packet);
     } while (nextLayerID != NO_NEXT_LAYER);
 
+    // Apply custom skipping
+    CustomEncapsulationSkip(packet);
     // Processing finished, reset analyzer set state for next packet
     analyzerSet->reset();
 
@@ -214,4 +213,32 @@ void Manager::processPacket(Packet* packet) {
         DBG_LOG(DBG_LLPOC, "Done, last found layer identifier was %#x.", nextLayerID);
     }
 #endif
+}
+
+void Manager::CustomEncapsulationSkip(Packet *packet) {
+    if (encap_hdr_size) {
+        auto pdata = packet->cur_pos;
+
+        // Blanket encapsulation. We assume that what remains is IP.
+        if (pdata + encap_hdr_size + sizeof(struct ip) >= packet->GetEndOfData()) {
+            packet->Weird("no_ip_left_after_encap");
+            return;
+        }
+
+        pdata += encap_hdr_size;
+
+        auto ip = (const struct ip *) pdata;
+
+        switch ( ip->ip_v )
+            {
+            case 4: packet->l3_proto = L3_IPV4;
+            case 6: packet->l3_proto = L3_IPV6;
+            default:
+                {
+                // Neither IPv4 nor IPv6.
+                packet->Weird("no_ip_in_encap");
+                return;
+                }
+            }
+    }
 }
