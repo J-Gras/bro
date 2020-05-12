@@ -35,18 +35,34 @@ void Manager::InitPostScript() {
     configuration.addMapping("ROOT", DLT_IEEE802_11, "IEEE802_11Analyzer");
     configuration.addMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
     configuration.addMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
+    //configuration.addMapping("ROOT", DLT_NULL, "NullAnalyzer");
 
     configuration.addMapping("EthernetAnalyzer", 0x8847, "MPLSAnalyzer");
-    configuration.addMapping("PPPSerialAnalyzer", 0x0281, "MPLSAnalyzer");
     configuration.addMapping("IEEE802_11_RadioAnalyzer", DLT_IEEE802_11, "IEEE802_11Analyzer");
-//    configuration.addMapping("ETHERNET", 0x800, "IP4");
-//    configuration.addMapping("ETHERNET", 0x86DD, "IP6");
-//    configuration.addMapping("ETHERNET", 0x806, "ARP");
-//    configuration.addMapping("ETHERNET", 0x8864, "PPPOE");
-//    configuration.addMapping("PPPOE", 0x21, "IP4");
-//    configuration.addMapping("PPPOE", 0x57, "IP6");
-//    configuration.addMapping("IP4", 0x1, "ICMP");
-//    configuration.addMapping("IP6", 0x3A, "ICMP6");
+
+    configuration.addMapping("PPPSerialAnalyzer", 0x0281, "MPLSAnalyzer");
+    configuration.addMapping("PPPSerialAnalyzer", 0x0021, "IPv4Analyzer");
+    configuration.addMapping("PPPSerialAnalyzer", 0x0057, "IPv6Analyzer");
+
+    configuration.addMapping("IEEE802_11Analyzer", 0x0800, "IPv4Analyzer");
+    configuration.addMapping("IEEE802_11Analyzer", 0x86DD, "IPv6Analyzer");
+    configuration.addMapping("IEEE802_11Analyzer", 0x0806, "ARPAnalyzer");
+    configuration.addMapping("IEEE802_11Analyzer", 0x8035, "ARPAnalyzer"); //RARP
+
+    configuration.addMapping("NFLogAnalyzer", AF_INET, "IPv4Analyzer");
+    configuration.addMapping("NFLogAnalyzer", AF_INET6, "IPv6Analyzer");
+
+    configuration.addMapping("NullAnalyzer", AF_INET, "IPv4Analyzer");
+    // From the Wireshark Wiki: "AF_INET6, unfortunately, has
+    // different values in {NetBSD,OpenBSD,BSD/OS},
+    // {FreeBSD,DragonFlyBSD}, and {Darwin/Mac OS X}, so an IPv6
+    // packet might have a link-layer header with 24, 28, or 30
+    // as the AF_ value." As we may be reading traces captured on
+    // platforms other than what we're running on, we accept them
+    // all here.
+    configuration.addMapping("NullAnalyzer", 24, "IPv6Analyzer");
+    configuration.addMapping("NullAnalyzer", 28, "IPv6Analyzer");
+    configuration.addMapping("NullAnalyzer", 30, "IPv6Analyzer");
 
     analyzerSet = new ProtocolAnalyzerSet(configuration);
 }
@@ -243,8 +259,8 @@ void Manager::CustomEncapsulationSkip(Packet *packet) {
 
         switch ( ip->ip_v )
             {
-            case 4: packet->l3_proto = L3_IPV4;
-            case 6: packet->l3_proto = L3_IPV6;
+            case 4: packet->l3_proto = L3_IPV4; break;
+            case 6: packet->l3_proto = L3_IPV6; break;
             default:
                 {
                 // Neither IPv4 nor IPv6.

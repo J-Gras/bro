@@ -8,7 +8,7 @@ IEEE802_11Analyzer::IEEE802_11Analyzer() : llanalyzer::Analyzer("IEEE802_11Analy
 IEEE802_11Analyzer::~IEEE802_11Analyzer() = default;
 
 std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> IEEE802_11Analyzer::analyze(Packet* packet) {
-    auto pdata = packet->cur_pos;
+    auto& pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
     u_char len_80211 = 24; // minimal length of data frames
@@ -101,21 +101,7 @@ std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> IEEE802_11Analy
     }
 
     identifier_t protocol = (pdata[0] << 8) + pdata[1];
-    if ( protocol == 0x0800 )
-        packet->l3_proto = L3_IPV4;
-    else if ( protocol == 0x86DD )
-        packet->l3_proto = L3_IPV6;
-    else if ( protocol == 0x0806 || protocol == 0x8035 )
-        packet->l3_proto = L3_ARP;
-    else
-    {
-        packet->Weird("non_ip_packet_in_ieee802_11");
-        return std::make_tuple(AnalyzerResult::Failed, 0);
-    }
     pdata += 2;
-
-    // Calculate how much header we've used up.
-    packet->hdr_size = (pdata - packet->data);
 
     return std::make_tuple(AnalyzerResult::Continue, protocol);
 }

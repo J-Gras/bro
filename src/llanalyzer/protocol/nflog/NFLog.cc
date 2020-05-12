@@ -8,23 +8,11 @@ NFLogAnalyzer::NFLogAnalyzer() : llanalyzer::Analyzer("NFLogAnalyzer") { }
 NFLogAnalyzer::~NFLogAnalyzer() = default;
 
 std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> NFLogAnalyzer::analyze(Packet* packet) {
-    auto pdata = packet->cur_pos;
+    auto& pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
     // See https://www.tcpdump.org/linktypes/LINKTYPE_NFLOG.html
-
     identifier_t protocol = pdata[0];
-
-    if ( protocol == AF_INET )
-        packet->l3_proto = L3_IPV4;
-    else if ( protocol == AF_INET6 )
-        packet->l3_proto = L3_IPV6;
-    else
-    {
-        packet->Weird("non_ip_in_nflog");
-        return std::make_tuple(AnalyzerResult::Failed, 0);
-    }
-
     uint8_t version = pdata[1];
 
     if ( version != 0 )
@@ -84,9 +72,6 @@ std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> NFLogAnalyzer::
             pdata += tlv_len;
         }
     }
-
-    // Calculate how much header we've used up.
-    packet->hdr_size = (pdata - packet->data);
 
     return std::make_tuple(AnalyzerResult::Continue, protocol);
 }
