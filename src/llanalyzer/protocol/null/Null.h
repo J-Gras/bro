@@ -10,7 +10,7 @@ public:
     NullAnalyzer();
     ~NullAnalyzer() override;
 
-    identifier_t analyze(Packet* packet) override;
+    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
 
     static Analyzer* Instantiate() {
         return new NullAnalyzer();

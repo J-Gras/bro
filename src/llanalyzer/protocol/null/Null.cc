@@ -7,7 +7,7 @@ NullAnalyzer::NullAnalyzer() : llanalyzer::Analyzer("NullAnalyzer") { }
 
 NullAnalyzer::~NullAnalyzer() = default;
 
-llanalyzer::identifier_t NullAnalyzer::analyze(Packet* packet) {
+std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> NullAnalyzer::analyze(Packet* packet) {
     auto pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
@@ -29,12 +29,12 @@ llanalyzer::identifier_t NullAnalyzer::analyze(Packet* packet) {
     else
     {
         packet->Weird("non_ip_packet_in_null_transport");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    return protocol;
+    return std::make_tuple(AnalyzerResult::Continue, protocol);
 }
 

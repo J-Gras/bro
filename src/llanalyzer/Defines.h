@@ -6,5 +6,13 @@
 
 namespace llanalyzer {
     using identifier_t = uint32_t;
-    static constexpr identifier_t NO_NEXT_LAYER = static_cast<identifier_t>(0u - 1u);
+
+    /**
+     * Result of low layer analysis.
+     */
+    enum class AnalyzerResult {
+        Failed,   // Analysis failed
+        Continue, // Analysis succeded and an encapuslated protocol was determined
+        Terminate // Analysis succeded and there is no further analysis to do
+    };
 }

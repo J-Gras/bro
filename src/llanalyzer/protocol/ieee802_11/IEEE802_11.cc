@@ -7,7 +7,7 @@ IEEE802_11Analyzer::IEEE802_11Analyzer() : llanalyzer::Analyzer("IEEE802_11Analy
 
 IEEE802_11Analyzer::~IEEE802_11Analyzer() = default;
 
-llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
+std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> IEEE802_11Analyzer::analyze(Packet* packet) {
     auto pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
@@ -16,18 +16,18 @@ llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
     if ( pdata + len_80211 >= end_of_data )
     {
         packet->Weird("truncated_802_11_header");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     u_char fc_80211 = pdata[0]; // Frame Control field
 
     // Skip non-data frame types (management & control).
     if ( ! ((fc_80211 >> 2) & 0x02) )
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
 
     // Skip subtypes without data.
     if ( (fc_80211 >> 4) & 0x04 )
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
 
     // 'To DS' and 'From DS' flags set indicate use of the 4th
     // address field.
@@ -40,7 +40,7 @@ llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
         // Skip in case of A-MSDU subframes indicated by QoS
         // control field.
         if ( pdata[len_80211] & 0x80)
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
 
         len_80211 += 2;
     }
@@ -48,7 +48,7 @@ llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
     if ( pdata + len_80211 >= end_of_data )
     {
         packet->Weird("truncated_802_11_header");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     // Determine link-layer addresses based
@@ -81,7 +81,7 @@ llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
     if ( pdata + 8 >= end_of_data )
     {
         packet->Weird("truncated_802_11_header");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
     // Check that the DSAP and SSAP are both SNAP and that the control
     // field indicates that this is an unnumbered frame.
@@ -97,7 +97,7 @@ llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
         // If this is a logical link control frame without the
         // possibility of having a protocol we care about, we'll
         // just skip it for now.
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     identifier_t protocol = (pdata[0] << 8) + pdata[1];
@@ -110,12 +110,12 @@ llanalyzer::identifier_t IEEE802_11Analyzer::analyze(Packet* packet) {
     else
     {
         packet->Weird("non_ip_packet_in_ieee802_11");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
     pdata += 2;
 
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    return protocol;
+    return std::make_tuple(AnalyzerResult::Continue, protocol);
 }

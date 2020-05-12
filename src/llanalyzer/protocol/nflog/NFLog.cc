@@ -7,7 +7,7 @@ NFLogAnalyzer::NFLogAnalyzer() : llanalyzer::Analyzer("NFLogAnalyzer") { }
 
 NFLogAnalyzer::~NFLogAnalyzer() = default;
 
-llanalyzer::identifier_t NFLogAnalyzer::analyze(Packet* packet) {
+std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> NFLogAnalyzer::analyze(Packet* packet) {
     auto pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
@@ -22,7 +22,7 @@ llanalyzer::identifier_t NFLogAnalyzer::analyze(Packet* packet) {
     else
     {
         packet->Weird("non_ip_in_nflog");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     uint8_t version = pdata[1];
@@ -30,7 +30,7 @@ llanalyzer::identifier_t NFLogAnalyzer::analyze(Packet* packet) {
     if ( version != 0 )
     {
         packet->Weird("unknown_nflog_version");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     // Skip to TLVs.
@@ -44,7 +44,7 @@ llanalyzer::identifier_t NFLogAnalyzer::analyze(Packet* packet) {
         if ( pdata + 4 >= end_of_data )
         {
             packet->Weird("nflog_no_pcap_payload");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
 
         // TLV Type and Length values are specified in host byte order
@@ -71,7 +71,7 @@ llanalyzer::identifier_t NFLogAnalyzer::analyze(Packet* packet) {
             if ( tlv_len < 4 )
             {
                 packet->Weird("nflog_bad_tlv_len");
-                return NO_NEXT_LAYER;
+                return std::make_tuple(AnalyzerResult::Failed, 0);
             }
             else
             {
@@ -88,5 +88,5 @@ llanalyzer::identifier_t NFLogAnalyzer::analyze(Packet* packet) {
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    return protocol;
+    return std::make_tuple(AnalyzerResult::Continue, protocol);
 }

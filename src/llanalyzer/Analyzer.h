@@ -53,7 +53,19 @@ public:
 	 */
 	bool IsAnalyzer(const char* name);
 
-	virtual identifier_t analyze(Packet *packet) = 0;
+	/**
+	 * Analyzes the given packet. The analysis is supposed to start at cur_pos
+	 * of the packet, which points to the so far unanalyzed part of the packet.
+	 * If the analyzed protocol encapsulates another protocol, the packet's
+	 * cur_pos should be updated to point to that payload.
+	 *
+	 * @param packet The packet to analyze.
+	 *
+	 * @return A tuple of analysis result and identifier. The result indicates
+	 * how to proceed. If analysis can continue, the identifier determines the
+	 * encapsulated protocol.
+	 */
+	virtual std::tuple<AnalyzerResult, identifier_t> analyze(Packet *packet) = 0;
 
 protected:
 	friend class Manager;

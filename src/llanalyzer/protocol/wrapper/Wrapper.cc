@@ -7,7 +7,7 @@ WrapperAnalyzer::WrapperAnalyzer() : llanalyzer::Analyzer("WrapperAnalyzer") { }
 
 WrapperAnalyzer::~WrapperAnalyzer() = default;
 
-llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
+std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> WrapperAnalyzer::analyze(Packet* packet) {
     // Unfortunately some packets on the link might have MPLS labels
     // while others don't. That means we need to ask the link-layer if
     // labels are in place.
@@ -22,7 +22,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
 
         if (pdata + cfplen + 14 >= end_of_data) {
             packet->Weird("truncated_link_header_cfp");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
 
         pdata += cfplen;
@@ -48,7 +48,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
             case 0x9100: {
                 if (pdata + 4 >= end_of_data) {
                     packet->Weird("truncated_link_header");
-                    return NO_NEXT_LAYER;
+                    return std::make_tuple(AnalyzerResult::Failed, 0);
                 }
 
                 auto &vlan_ref = saw_vlan ? packet->inner_vlan : packet->vlan;
@@ -64,7 +64,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
             case 0x8864: {
                 if (pdata + 8 >= end_of_data) {
                     packet->Weird("truncated_link_header");
-                    return NO_NEXT_LAYER;
+                    return std::make_tuple(AnalyzerResult::Failed, 0);
                 }
 
                 protocol = (pdata[6] << 8u) + pdata[7];
@@ -77,7 +77,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
                 else {
                     // Neither IPv4 nor IPv6.
                     packet->Weird("non_ip_packet_in_pppoe_encapsulation");
-                    return NO_NEXT_LAYER;
+                    return std::make_tuple(AnalyzerResult::Failed, 0);
                 }
             }
                 break;
@@ -99,7 +99,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("non_ip_packet_in_ethernet");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
     }
 
@@ -110,7 +110,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
         while (!end_of_stack) {
             if (pdata + 4 >= end_of_data) {
                 packet->Weird("truncated_link_header");
-                return NO_NEXT_LAYER;
+                return std::make_tuple(AnalyzerResult::Failed, 0);
             }
 
             end_of_stack = *(pdata + 2u) & 0x01;
@@ -120,7 +120,7 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
         // We assume that what remains is IP
         if (pdata + sizeof(struct ip) >= end_of_data) {
             packet->Weird("no_ip_in_mpls_payload");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
 
         const struct ip *ip = (const struct ip *) pdata;
@@ -132,12 +132,12 @@ llanalyzer::identifier_t WrapperAnalyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("no_ip_in_mpls_payload");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
     }
 
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    return protocol;
+    return std::make_tuple(AnalyzerResult::Continue, protocol);
 }

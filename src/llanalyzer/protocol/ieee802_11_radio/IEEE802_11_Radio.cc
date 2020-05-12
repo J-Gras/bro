@@ -9,14 +9,14 @@ IEEE802_11_RadioAnalyzer::IEEE802_11_RadioAnalyzer() : llanalyzer::Analyzer("IEE
 
 IEEE802_11_RadioAnalyzer::~IEEE802_11_RadioAnalyzer() = default;
 
-llanalyzer::identifier_t IEEE802_11_RadioAnalyzer::analyze(Packet* packet) {
+std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> IEEE802_11_RadioAnalyzer::analyze(Packet* packet) {
     auto pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
     if ( pdata + 3 >= end_of_data )
     {
         packet->Weird("truncated_radiotap_header");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     // Skip over the RadioTap header
@@ -25,10 +25,10 @@ llanalyzer::identifier_t IEEE802_11_RadioAnalyzer::analyze(Packet* packet) {
     if ( pdata + rtheader_len >= end_of_data )
     {
         packet->Weird("truncated_radiotap_header");
-        return NO_NEXT_LAYER;
+        return std::make_tuple(AnalyzerResult::Failed, 0);
     }
 
     packet->cur_pos += rtheader_len;
 
-    return DLT_IEEE802_11;
+    return std::make_tuple(AnalyzerResult::Continue, DLT_IEEE802_11);
 }

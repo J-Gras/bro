@@ -7,7 +7,7 @@ EthernetAnalyzer::EthernetAnalyzer() : llanalyzer::Analyzer("EthernetAnalyzer") 
 
 EthernetAnalyzer::~EthernetAnalyzer() = default;
 
-llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
+std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> EthernetAnalyzer::analyze(Packet* packet) {
     auto& pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
@@ -17,7 +17,7 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
 
         if (pdata + cfplen + 14 >= end_of_data) {
             packet->Weird("truncated_link_header_cfp");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
 
         pdata += cfplen;
@@ -43,7 +43,7 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
             case 0x9100: {
                 if (pdata + 4 >= end_of_data) {
                     packet->Weird("truncated_link_header");
-                    return NO_NEXT_LAYER;
+                    return std::make_tuple(AnalyzerResult::Failed, 0);
                 }
 
                 auto &vlan_ref = saw_vlan ? packet->inner_vlan : packet->vlan;
@@ -59,7 +59,7 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
             case 0x8864: {
                 if (pdata + 8 >= end_of_data) {
                     packet->Weird("truncated_link_header");
-                    return NO_NEXT_LAYER;
+                    return std::make_tuple(AnalyzerResult::Failed, 0);
                 }
 
                 protocol = (pdata[6] << 8u) + pdata[7];
@@ -72,7 +72,7 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
                 else {
                     // Neither IPv4 nor IPv6.
                     packet->Weird("non_ip_packet_in_pppoe_encapsulation");
-                    return NO_NEXT_LAYER;
+                    return std::make_tuple(AnalyzerResult::Failed, 0);
                 }
             }
                 break;
@@ -81,7 +81,7 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
 
     // Check for MPLS in VLAN.
     if (protocol == 0x8847)
-        return protocol;
+        return std::make_tuple(AnalyzerResult::Continue, protocol);
 
     // Normal path to determine Layer 3 protocol.
     if (packet->l3_proto == L3_UNKNOWN) {
@@ -94,7 +94,7 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
         else {
             // Neither IPv4 nor IPv6.
             packet->Weird("non_ip_packet_in_ethernet");
-            return NO_NEXT_LAYER;
+            return std::make_tuple(AnalyzerResult::Failed, 0);
         }
     }
 
@@ -102,5 +102,5 @@ llanalyzer::identifier_t EthernetAnalyzer::analyze(Packet* packet) {
     // Calculate how much header we've used up.
     packet->hdr_size = (pdata - packet->data);
 
-    return NO_NEXT_LAYER;
+    return std::make_tuple(AnalyzerResult::Terminate, 0);
 }

@@ -10,7 +10,7 @@ public:
     IEEE802_11_RadioAnalyzer();
     ~IEEE802_11_RadioAnalyzer() override;
 
-    identifier_t analyze(Packet* packet) override;
+    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
 
     static Analyzer* Instantiate() {
         return new IEEE802_11_RadioAnalyzer();

@@ -188,34 +188,43 @@ void Manager::processPacket(Packet* packet) {
     static size_t counter = 0;
     DBG_LOG(DBG_LLPOC, "Analyzing packet %ld, ts=%.3f...", ++counter, packet->time);
 #endif
-    //TODO: What about blanket encapsulation by encap_hdr_size?
-
-    // Dispatch and analyze layers until getIdentifier returns -1 --> end of packet reached
-    identifier_t nextLayerID = packet->link_type;
+    // Dispatch and analyze layers
+    AnalyzerResult result = AnalyzerResult::Continue;
+    identifier_t nextLayerId = packet->link_type;
     do {
-        Analyzer* currentAnalyzer = analyzerSet->dispatch(nextLayerID);
+        Analyzer* currentAnalyzer = analyzerSet->dispatch(nextLayerId);
 
         // Analyzer not found
         if (currentAnalyzer == nullptr) {
+            //TODO: Fallback to IP or generate weird
             break;
         }
 
         // Analyze this layer and get identifier of next layer protocol
-        nextLayerID = currentAnalyzer->analyze(packet);
-    } while (nextLayerID != NO_NEXT_LAYER);
-
-    // Apply custom skipping
-    CustomEncapsulationSkip(packet);
-    // Processing finished, reset analyzer set state for next packet
-    analyzerSet->reset();
+        std::tie(result, nextLayerId) = currentAnalyzer->analyze(packet);
 
 #ifdef DEBUG
-    if (nextLayerID == NO_NEXT_LAYER) {
-        DBG_LOG(DBG_LLPOC, "Done.");
-    } else {
-        DBG_LOG(DBG_LLPOC, "Done, last found layer identifier was %#x.", nextLayerID);
-    }
+        switch ( result ) {
+            case AnalyzerResult::Continue:
+                DBG_LOG(DBG_LLPOC, "Analysis in %s succeded, next layer identifier is %#x.",
+                        currentAnalyzer->GetAnalyzerName(), nextLayerId);
+                break;
+            case AnalyzerResult::Terminate:
+                DBG_LOG(DBG_LLPOC, "Done, last found layer identifier was %#x.", nextLayerId);
+                break;
+            default:
+                DBG_LOG(DBG_LLPOC, "Analysis failed in %s", currentAnalyzer->GetAnalyzerName());
+        }
 #endif
+
+    } while (result == AnalyzerResult::Continue);
+
+    if ( result == AnalyzerResult::Terminate ) {
+        CustomEncapsulationSkip(packet);
+    }
+
+    // Processing finished, reset analyzer set state for next packet
+    analyzerSet->reset();
 }
 
 void Manager::CustomEncapsulationSkip(Packet *packet) {
