@@ -2,7 +2,7 @@
 
 namespace llanalyzer {
 
-ProtocolAnalyzerSet::ProtocolAnalyzerSet(Config& configuration) {
+ProtocolAnalyzerSet::ProtocolAnalyzerSet(Config& configuration, const std::string& defaultAnalyzerName) {
     // Instantiate objects for all analyzers
     for (const auto& currentDispatcherConfig : configuration.getDispatchers()) {
         for (const auto& currentMapping : currentDispatcherConfig.getMappings()) {
@@ -20,41 +20,51 @@ ProtocolAnalyzerSet::ProtocolAnalyzerSet(Config& configuration) {
     }
 
     // Generate Dispatchers, starting at root
-    head = getDispatcher(configuration, "ROOT");
-
-    // If head is nullptr now, "ROOT" was not found in the config --> wrong config, abort
-    if (head == nullptr) {
+    rootDispatcher = getDispatcher(configuration, "ROOT");
+    if (rootDispatcher == nullptr) {
         reporter->InternalError("No dispatching configuration for ROOT of llanalyzer set.");
     }
 
-    currentState = head;
+
+    // Set up default analysis
+    defaultDispatcher = nullptr;
+    defaultAnalyzer = (analyzers.count(defaultAnalyzerName) != 0) ?
+                      analyzers[defaultAnalyzerName] : llanalyzer_mgr->InstantiateAnalyzer(defaultAnalyzerName);
+    if ( defaultAnalyzer != nullptr ) {
+        defaultDispatcher = getDispatcher(configuration, defaultAnalyzerName);
+    }
+
+    currentState = rootDispatcher;
 }
 
 ProtocolAnalyzerSet::~ProtocolAnalyzerSet() {
     for (const auto& current : analyzers) {
         delete current.second;
     }
+    //TODO: Clean dispatcher and defaults
 }
 
 Analyzer* ProtocolAnalyzerSet::dispatch(identifier_t identifier) {
     // Because leaf nodes (aka no more dispatching) can still have an existing analyzer that returns more identifiers,
     // currentState needs to be checked to be not null. In this case there would have been an analyzer dispatched
     // in the last layer, but no dispatcher for it (end of FSM)
-    if (currentState == nullptr) {
-        return nullptr;
-    }
+    const Value* result = (currentState != nullptr) ? currentState->Lookup(identifier) : nullptr;
 
-    const Value* result = currentState->Lookup(identifier);
-    if (result == nullptr) {
+    if (result == nullptr ) {
+        if ( currentState != defaultDispatcher ) {
+            // Switch to default analysis once
+            currentState = defaultDispatcher;
+            return defaultAnalyzer;
+        }
         return nullptr;
+    } else {
+        currentState = result->dispatcher;
+        return result->analyzer;
     }
-
-    currentState = result->dispatcher;
-    return result->analyzer;
 }
 
 void ProtocolAnalyzerSet::reset() {
-    currentState = head;
+    currentState = rootDispatcher;
 }
 
 void ProtocolAnalyzerSet::DumpDebug() const {

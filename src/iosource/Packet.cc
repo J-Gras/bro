@@ -70,11 +70,12 @@ void Packet::Init(int arg_link_type, pkt_timeval *arg_ts, uint32_t arg_caplen,
 		}
 
 	if ( data )
-		{
-	    l2_valid = true;
+	    {
+        l2_valid = true; //TODO: Investigate use of that flag
         llanalyzer_mgr->processPacket(this);
-		}
-	}
+        //ProcessLayer2();
+        }
+    }
 
 const IP_Hdr Packet::IP() const
 	{

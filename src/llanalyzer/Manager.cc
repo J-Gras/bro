@@ -26,8 +26,6 @@ void Manager::InitPreScript() {
 void Manager::InitPostScript() {
     // Read in configuration
     // TODO: just a mockup now, do for real
-
-    // Configuration Mockup
     Config configuration;
     //configuration.addMapping("ROOT", DLT_EN10MB, "WrapperAnalyzer");
     configuration.addMapping("ROOT", DLT_EN10MB, "EthernetAnalyzer");
@@ -36,6 +34,9 @@ void Manager::InitPostScript() {
     configuration.addMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
     configuration.addMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
     //configuration.addMapping("ROOT", DLT_NULL, "NullAnalyzer");
+
+    configuration.addMapping("DefaultAnalyzer", 4, "IPv4Analyzer");
+    configuration.addMapping("DefaultAnalyzer", 6, "IPv6Analyzer");
 
     configuration.addMapping("EthernetAnalyzer", 0x8847, "MPLSAnalyzer");
     configuration.addMapping("IEEE802_11_RadioAnalyzer", DLT_IEEE802_11, "IEEE802_11Analyzer");
@@ -64,7 +65,7 @@ void Manager::InitPostScript() {
     configuration.addMapping("NullAnalyzer", 28, "IPv6Analyzer");
     configuration.addMapping("NullAnalyzer", 30, "IPv6Analyzer");
 
-    analyzerSet = new ProtocolAnalyzerSet(configuration);
+    analyzerSet = new ProtocolAnalyzerSet(configuration, "DefaultAnalyzer");
 }
 
 void Manager::Done() {
@@ -208,11 +209,10 @@ void Manager::processPacket(Packet* packet) {
     AnalyzerResult result = AnalyzerResult::Continue;
     identifier_t nextLayerId = packet->link_type;
     do {
-        Analyzer* currentAnalyzer = analyzerSet->dispatch(nextLayerId);
+        auto currentAnalyzer = analyzerSet->dispatch(nextLayerId);
 
         // Analyzer not found
-        if (currentAnalyzer == nullptr) {
-            //TODO: Fallback to IP or generate weird
+        if ( currentAnalyzer == nullptr ) {
             break;
         }
 

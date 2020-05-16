@@ -12,7 +12,7 @@ namespace llanalyzer {
 
 class ProtocolAnalyzerSet : public AnalyzerSet {
 public:
-    explicit ProtocolAnalyzerSet(Config& configuration);
+    explicit ProtocolAnalyzerSet(Config& configuration, const std::string& defaultAnalyzerName);
     ~ProtocolAnalyzerSet() override;
 
     Analyzer* dispatch(identifier_t identifier) override;
@@ -28,8 +28,10 @@ private:
 
     std::map<std::string, Analyzer*> analyzers;
     std::map<std::string, Dispatcher*> dispatchers;
-    Dispatcher* head;
+    Dispatcher* rootDispatcher;
+    Dispatcher* defaultDispatcher;
     Dispatcher* currentState;
+    Analyzer* defaultAnalyzer;
 
     Dispatcher* getDispatcher(Config& configuration, const std::string& dispatcherName);
 };
