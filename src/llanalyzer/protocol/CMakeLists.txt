@@ -8,6 +8,7 @@ add_subdirectory(ieee802_11)
 add_subdirectory(ieee802_11_radio)
 add_subdirectory(nflog)
 add_subdirectory(mpls)
+add_subdirectory(linux_sll)
 
 add_subdirectory(arp)
 add_subdirectory(ipv4)

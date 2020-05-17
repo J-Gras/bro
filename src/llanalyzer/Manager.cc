@@ -33,7 +33,8 @@ void Manager::InitPostScript() {
     configuration.addMapping("ROOT", DLT_IEEE802_11, "IEEE802_11Analyzer");
     configuration.addMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
     configuration.addMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
-    //configuration.addMapping("ROOT", DLT_NULL, "NullAnalyzer");
+    configuration.addMapping("ROOT", DLT_NULL, "NullAnalyzer");
+    configuration.addMapping("ROOT", DLT_LINUX_SLL, "LinuxSLLAnalyzer");
 
     configuration.addMapping("DefaultAnalyzer", 4, "IPv4Analyzer");
     configuration.addMapping("DefaultAnalyzer", 6, "IPv6Analyzer");
@@ -64,6 +65,11 @@ void Manager::InitPostScript() {
     configuration.addMapping("NullAnalyzer", 24, "IPv6Analyzer");
     configuration.addMapping("NullAnalyzer", 28, "IPv6Analyzer");
     configuration.addMapping("NullAnalyzer", 30, "IPv6Analyzer");
+
+    configuration.addMapping("LinuxSLLAnalyzer", 0x0800, "IPv4Analyzer");
+    configuration.addMapping("LinuxSLLAnalyzer", 0x86DD, "IPv6Analyzer");
+    configuration.addMapping("LinuxSLLAnalyzer", 0x0806, "ARPAnalyzer");
+    configuration.addMapping("LinuxSLLAnalyzer", 0x8035, "ARPAnalyzer"); //RARP
 
     analyzerSet = new ProtocolAnalyzerSet(configuration, "DefaultAnalyzer");
 }

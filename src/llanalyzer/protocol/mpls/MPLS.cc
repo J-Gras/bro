@@ -23,7 +23,8 @@ std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> MPLSAnalyzer::a
         pdata += 4;
     }
 
-    // We assume that what remains is IP
+    // According to RFC3032 the encapsulated protocol is not encoded.
+    // We assume that what remains is IP.
     if (pdata + sizeof(struct ip) >= end_of_data) {
         packet->Weird("no_ip_in_mpls_payload");
         return std::make_tuple(AnalyzerResult::Failed, 0);
