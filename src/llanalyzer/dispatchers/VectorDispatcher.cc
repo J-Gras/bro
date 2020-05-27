@@ -67,7 +67,7 @@ void VectorDispatcher::Register(const register_map& data) {
 
 const Value* VectorDispatcher::Lookup(identifier_t identifier) const {
     int64_t index = identifier - lowestIdentifier;
-    if (index >= 0 && index < table.size() && table[index] != nullptr) {
+    if (index >= 0 && index < static_cast<int64_t>(table.size()) && table[index] != nullptr) {
         return table[index];
     } else {
         return nullptr;
@@ -109,4 +109,3 @@ void VectorDispatcher::DumpDebug() const {
 }
 
 }
-

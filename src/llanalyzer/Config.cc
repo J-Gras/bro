@@ -5,7 +5,7 @@ namespace llanalyzer {
     // ##############################
     // ####### DispatcherConfig #####
     // ##############################
-    const string& DispatcherConfig::getName() const {
+    const std::string& DispatcherConfig::getName() const {
         return name;
     }
 

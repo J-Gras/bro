@@ -140,7 +140,7 @@ bool Manager::DisableAnalyzer(EnumVal *val) {
 void Manager::DisableAllAnalyzers() {
     DBG_LOG(DBG_LLPOC, "Disabling all analyzers");
 
-    list<Component *> all_analyzers = GetComponents();
+    std::list<Component *> all_analyzers = GetComponents();
     for (auto i = all_analyzers.begin(); i != all_analyzers.end(); ++i)
         (*i)->SetEnabled(false);
 }
