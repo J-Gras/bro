@@ -38,10 +38,13 @@ ProtocolAnalyzerSet::ProtocolAnalyzerSet(Config& configuration, const std::strin
 }
 
 ProtocolAnalyzerSet::~ProtocolAnalyzerSet() {
+    bool deleteDefault = defaultAnalyzer != nullptr;
     for (const auto& current : analyzers) {
+        if (current.second == defaultAnalyzer)
+            deleteDefault = false;
         delete current.second;
     }
-    //TODO: Clean dispatcher and defaults
+    if (deleteDefault) delete defaultAnalyzer;
 }
 
 Analyzer* ProtocolAnalyzerSet::dispatch(identifier_t identifier) {
