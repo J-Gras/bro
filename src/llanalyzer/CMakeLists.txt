@@ -1,4 +1,3 @@
-
 include(ZeekSubdir)
 
 include_directories(BEFORE
@@ -22,4 +21,3 @@ set(llanalyzer_SRCS
 
 bro_add_subdir_library(llanalyzer ${llanalyzer_SRCS})
 add_dependencies(bro_llanalyzer generate_outputs)
-

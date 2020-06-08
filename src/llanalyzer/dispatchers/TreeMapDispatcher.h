@@ -3,22 +3,22 @@
 #include <map>
 #include "Dispatcher.h"
 
-namespace llanalyzer {
+namespace zeek::llanalyzer {
 
-class TreeMapDispatcher : public Dispatcher {
+class TreeMapDispatcher : public Dispatcher	{
 public:
-    ~TreeMapDispatcher() override;
+	~TreeMapDispatcher() override;
 
-    bool Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher) override;
-    Value* Lookup(identifier_t identifier) const override;
-    size_t size() const override;
-    void clear() override;
+	bool Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher) override;
+	Value* Lookup(identifier_t identifier) const override;
+	size_t Size() const override;
+	void Clear() override;
 
-    void DumpDebug() const override;
+	void DumpDebug() const override;
 
 private:
-    std::map<identifier_t, Value*> table;
-    void freeValues();
-};
+	std::map<identifier_t, Value*> table;
+	void FreeValues();
+	};
 
 }

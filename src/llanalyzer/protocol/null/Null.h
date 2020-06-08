@@ -3,18 +3,19 @@
 #include <llanalyzer/Analyzer.h>
 #include <llanalyzer/Component.h>
 
-namespace llanalyzer { namespace Null {
+namespace zeek::llanalyzer::Null {
 
 class NullAnalyzer : public Analyzer {
 public:
-    NullAnalyzer();
-    ~NullAnalyzer() override;
+	NullAnalyzer();
+	~NullAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate() {
-        return new NullAnalyzer();
-    }
+	static Analyzer* Instantiate()
+		{
+		return new NullAnalyzer();
+		}
 };
 
-} }
+}

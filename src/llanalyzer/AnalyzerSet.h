@@ -1,21 +1,22 @@
 #pragma once
 
-#include "Defines.h"
 #include "Analyzer.h"
+#include "Defines.h"
 
-namespace llanalyzer {
+namespace zeek::llanalyzer {
+
 class Analyzer;
 
 class AnalyzerSet {
 public:
-    virtual ~AnalyzerSet() = default;
-    virtual Analyzer* dispatch(identifier_t identifier) = 0;
-    virtual void reset() = 0;
+	virtual ~AnalyzerSet() = default;
+	virtual Analyzer* Dispatch(identifier_t identifier) = 0;
+	virtual void Reset() = 0;
 
 protected:
-    friend class Manager;
+	friend class Manager;
 
-    virtual void DumpDebug() const = 0;
+	virtual void DumpDebug() const = 0;
 };
 
-} // end of llanalyzer namespace
+}

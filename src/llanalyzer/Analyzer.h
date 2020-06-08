@@ -1,13 +1,12 @@
 // See the file "COPYING" in the main distribution directory for copyright.
-
 #pragma once
 
-#include <iosource/Packet.h>
-#include "Tag.h"
 #include "Defines.h"
 #include "Manager.h"
+#include "Tag.h"
+#include <iosource/Packet.h>
 
-namespace llanalyzer {
+namespace zeek::llanalyzer {
 
 class Analyzer {
 public:
@@ -30,7 +29,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	virtual ~Analyzer();
+	virtual ~Analyzer() = default;
 
 	/**
 	 * Returns the tag associated with the analyzer's type.
@@ -65,15 +64,15 @@ public:
 	 * how to proceed. If analysis can continue, the identifier determines the
 	 * encapsulated protocol.
 	 */
-	virtual std::tuple<AnalyzerResult, identifier_t> analyze(Packet *packet) = 0;
+	virtual std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) = 0;
 
 protected:
 	friend class Manager;
 
 private:
-    Tag tag;
+	Tag tag;
 
-    void init(const Tag& tag);
+	void Init(const Tag& tag);
 };
 
 } // llanalyzer namespace end

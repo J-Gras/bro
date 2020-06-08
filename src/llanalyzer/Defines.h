@@ -1,10 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
-#include <map>
 
-namespace llanalyzer {
+namespace zeek::llanalyzer {
+
     using identifier_t = uint32_t;
 
     /**
@@ -15,4 +14,5 @@ namespace llanalyzer {
         Continue, // Analysis succeded and an encapuslated protocol was determined
         Terminate // Analysis succeded and there is no further analysis to do
     };
+
 }

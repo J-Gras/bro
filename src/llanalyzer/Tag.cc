@@ -3,29 +3,39 @@
 #include "Tag.h"
 #include "Manager.h"
 
-llanalyzer::Tag llanalyzer::Tag::Error;
+namespace zeek::llanalyzer {
 
-llanalyzer::Tag::Tag(type_t type, subtype_t subtype)
-  : ::Tag(llanalyzer_mgr->GetTagType(), type, subtype) {
-}
+Tag Tag::Error;
 
-llanalyzer::Tag &llanalyzer::Tag::operator=(const llanalyzer::Tag &other) {
-    ::Tag::operator=(other);
-    return *this;
-}
+Tag::Tag(type_t type, subtype_t subtype)
+	: ::Tag(llanalyzer_mgr->GetTagType(), type, subtype)
+	{
+	}
 
-const IntrusivePtr<EnumVal>& llanalyzer::Tag::AsVal() const {
-  return ::Tag::AsVal(llanalyzer_mgr->GetTagType());
-}
+Tag& Tag::operator=(const Tag& other)
+	{
+	::Tag::operator=(other);
+	return *this;
+	}
 
-EnumVal* llanalyzer::Tag::AsEnumVal() const {
-  return AsVal().get();
-}
+const IntrusivePtr<EnumVal>& Tag::AsVal() const
+	{
+	return ::Tag::AsVal(llanalyzer_mgr->GetTagType());
+	}
 
-llanalyzer::Tag::Tag(IntrusivePtr<EnumVal> val)
+EnumVal* Tag::AsEnumVal() const
+	{
+	return AsVal().get();
+	}
+
+Tag::Tag(IntrusivePtr<EnumVal> val)
 	: ::Tag(std::move(val))
-	{ }
+	{
+	}
 
-llanalyzer::Tag::Tag(EnumVal* val)
-	: ::Tag({NewRef{}, val})
-	{ }
+Tag::Tag(EnumVal* val)
+	: ::Tag({NewRef {}, val})
+	{
+	}
+
+}

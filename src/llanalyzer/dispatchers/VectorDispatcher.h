@@ -1,36 +1,39 @@
 #pragma once
 
+#include <utility>
 #include "Dispatcher.h"
 
-#include <utility>
-
-namespace llanalyzer {
+namespace zeek::llanalyzer {
 
 class VectorDispatcher : public Dispatcher {
 public:
-    VectorDispatcher() : lowestIdentifier(0), table(std::vector<Value*>(1, nullptr)) {}
-    ~VectorDispatcher() override;
+	VectorDispatcher()
+		: table(std::vector<Value*>(1, nullptr))
+		{ }
 
-    bool Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher) override;
-    void Register(const register_map& data) override;
+	~VectorDispatcher() override;
 
-    const Value* Lookup(identifier_t identifier) const override;
+	bool Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher) override;
+	void Register(const register_map& data) override;
 
-    size_t size() const override;
-    void clear() override;
+	const Value* Lookup(identifier_t identifier) const override;
+
+	size_t Size() const override;
+	void Clear() override;
 
 protected:
-    void DumpDebug() const override;
+	void DumpDebug() const override;
 
 private:
-    identifier_t lowestIdentifier;
-    std::vector<Value*> table;
+	identifier_t lowest_identifier = 0;
+	std::vector<Value*> table;
 
-    void freeValues();
+	void FreeValues();
 
-    inline identifier_t getHighestIdentifier() const {
-        return lowestIdentifier + table.size() - 1;
-    }
+	inline identifier_t GetHighestIdentifier() const
+		{
+		return lowest_identifier + table.size() - 1;
+		}
 };
 
 }

@@ -1,66 +1,81 @@
 #include "Config.h"
 #include "Reporter.h"
 
-namespace llanalyzer {
-    // ##############################
-    // ####### DispatcherConfig #####
-    // ##############################
-    const std::string& DispatcherConfig::getName() const {
-        return name;
-    }
+namespace zeek::llanalyzer {
 
-    const std::map<identifier_t, std::string>& DispatcherConfig::getMappings() const {
-        return mappings;
-    }
+// ##############################
+// ####### DispatcherConfig #####
+// ##############################
+const std::string& DispatcherConfig::GetName() const
+	{
+	return name;
+	}
 
-    void DispatcherConfig::addMapping(identifier_t identifier, const std::string& analyzerName) {
-        if (mappings.count(identifier)) {
-            reporter->InternalError("Invalid config, identifier %x does already exist for dispatcher set %s.", identifier, name.c_str());
-        }
+const std::map<identifier_t, std::string>& DispatcherConfig::GetMappings() const
+	{
+	return mappings;
+	}
 
-        mappings.emplace(identifier, analyzerName);
-    }
+void DispatcherConfig::AddMapping(identifier_t identifier,
+								  const std::string& analyzer_name)
+	{
+	if ( mappings.count(identifier) )
+		reporter->InternalError("Invalid config, identifier %x does already exist "
+								"for dispatcher set %s.",
+								identifier, name.c_str());
 
-    bool DispatcherConfig::operator==(const DispatcherConfig &rhs) const {
-        return name == rhs.name;
-    }
+	mappings.emplace(identifier, analyzer_name);
+	}
 
-    bool DispatcherConfig::operator!=(const DispatcherConfig &rhs) const {
-        return !(rhs == *this);
-    }
+bool DispatcherConfig::operator==(const DispatcherConfig& rhs) const
+	{
+	return name == rhs.name;
+	}
 
-    // ##############################
-    // ########### Config ###########
-    // ##############################
-    std::optional<std::reference_wrapper<DispatcherConfig>> Config::getDispatcherConfig(const std::string& name) {
-        auto it = std::find_if(dispatchers.begin(), dispatchers.end(), [&](const DispatcherConfig& conf) {
-            return conf.getName() == name;
-        });
+bool DispatcherConfig::operator!=(const DispatcherConfig& rhs) const
+	{
+	return ! (rhs == *this);
+	}
 
-        if (it == dispatchers.end()) {
-            return {};
-        } else {
-            return {std::ref(*it)};
-        }
-    }
+// ##############################
+// ########### Config ###########
+// ##############################
+std::optional<std::reference_wrapper<DispatcherConfig>>
+Config::GetDispatcherConfig(const std::string& name)
+	{
+	auto it = std::find_if(
+		dispatchers.begin(), dispatchers.end(),
+		[&](const DispatcherConfig& conf) {
+			return conf.GetName() == name;
+		});
 
-    const std::vector<DispatcherConfig>& Config::getDispatchers() const{
-        return dispatchers;
-    }
+	if ( it == dispatchers.end() )
+		return {};
+	else
+		return {std::ref(*it)};
+	}
 
-    DispatcherConfig& Config::addDispatcherConfig(const std::string& name) {
-        return dispatchers.emplace_back(name);
-    }
+const std::vector<DispatcherConfig>& Config::GetDispatchers() const
+	{
+	return dispatchers;
+	}
 
-    void Config::addMapping(const std::string& name, identifier_t identifier, const std::string& analyzerName) {
-        // Create dispatcher config if it does not exist yet
-        std::optional<std::reference_wrapper<DispatcherConfig>> dispatcherConfig = getDispatcherConfig(name);
+DispatcherConfig& Config::AddDispatcherConfig(const std::string& name)
+	{
+	return dispatchers.emplace_back(name);
+	}
 
-        if (!dispatcherConfig) {
-            addDispatcherConfig(name).addMapping(identifier, analyzerName);
-        } else {
-            dispatcherConfig->get().addMapping(identifier, analyzerName);
-        }
+void Config::AddMapping(const std::string& name, identifier_t identifier,
+						const std::string& analyzer_name)
+	{
+	// Create dispatcher config if it does not exist yet
+	std::optional<std::reference_wrapper<DispatcherConfig>> dispatch_config =
+		GetDispatcherConfig(name);
 
-    }
-}
+	if ( ! dispatch_config )
+		AddDispatcherConfig(name).AddMapping(identifier, analyzer_name);
+	else
+		dispatch_config->get().AddMapping(identifier, analyzer_name);
+	}
+
+} // namespace llanalyzer

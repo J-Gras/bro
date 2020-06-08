@@ -1,13 +1,15 @@
 #include "PPPSerial.h"
 #include "NetVar.h"
 
-using namespace llanalyzer::PPPSerial;
+using namespace zeek::llanalyzer::PPPSerial;
 
-PPPSerialAnalyzer::PPPSerialAnalyzer() : llanalyzer::Analyzer("PPPSerialAnalyzer") { }
+PPPSerialAnalyzer::PPPSerialAnalyzer()
+	: zeek::llanalyzer::Analyzer("PPPSerialAnalyzer")
+	{
+	}
 
-PPPSerialAnalyzer::~PPPSerialAnalyzer() = default;
-
-std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> PPPSerialAnalyzer::analyze(Packet* packet) {
+std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> PPPSerialAnalyzer::Analyze(Packet* packet)
+	{
     auto& pdata = packet->cur_pos;
 
     // Extract protocol identifier
@@ -15,4 +17,4 @@ std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> PPPSerialAnalyz
     pdata += 4; // skip link header
 
     return std::make_tuple(AnalyzerResult::Continue, protocol);
-}
+	}

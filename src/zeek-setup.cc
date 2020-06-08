@@ -94,7 +94,7 @@ threading::Manager* thread_mgr = nullptr;
 input::Manager* input_mgr = nullptr;
 zeek::plugin::Manager* plugin_mgr = nullptr;
 analyzer::Manager* analyzer_mgr = nullptr;
-llanalyzer::Manager* llanalyzer_mgr = nullptr;
+zeek::llanalyzer::Manager* llanalyzer_mgr = nullptr;
 file_analysis::Manager* file_mgr = nullptr;
 zeekygen::Manager* zeekygen_mgr = nullptr;
 iosource::Manager* iosource_mgr = nullptr;
@@ -579,7 +579,6 @@ zeek::detail::SetupResult zeek::detail::setup(int argc, char** argv,
 
 	plugin_mgr->InitPreScript();
 	analyzer_mgr->InitPreScript();
-	llanalyzer_mgr->InitPreScript();
 	file_mgr->InitPreScript();
 	zeekygen_mgr->InitPreScript();
 

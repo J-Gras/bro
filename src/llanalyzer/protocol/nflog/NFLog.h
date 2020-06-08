@@ -3,18 +3,19 @@
 #include <llanalyzer/Analyzer.h>
 #include <llanalyzer/Component.h>
 
-namespace llanalyzer { namespace NFLog {
+namespace zeek::llanalyzer::NFLog {
 
 class NFLogAnalyzer : public Analyzer {
 public:
     NFLogAnalyzer();
-    ~NFLogAnalyzer() override;
+	~NFLogAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
+    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate() {
-        return new NFLogAnalyzer();
-    }
+    static Analyzer* Instantiate()
+		{
+		return new NFLogAnalyzer();
+		}
 };
 
-} }
+}

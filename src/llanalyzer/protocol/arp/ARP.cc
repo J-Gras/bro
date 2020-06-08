@@ -1,16 +1,18 @@
 #include "ARP.h"
 
-using namespace llanalyzer::ARP;
+using namespace zeek::llanalyzer::ARP;
 
-ARPAnalyzer::ARPAnalyzer() : llanalyzer::Analyzer("ARPAnalyzer") { }
+ARPAnalyzer::ARPAnalyzer()
+	: zeek::llanalyzer::Analyzer("ARPAnalyzer")
+	{
+	}
 
-ARPAnalyzer::~ARPAnalyzer() = default;
+std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> ARPAnalyzer::Analyze(Packet* packet)
+	{
+	// TODO: Make ARP analyzer a native LL analyzer
+	packet->l3_proto = L3_ARP;
+	packet->hdr_size = (packet->cur_pos - packet->data);
 
-std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> ARPAnalyzer::analyze(Packet* packet) {
-    // TODO: Make ARP analyzer a native LL analyzer
-    packet->l3_proto = L3_ARP;
-    packet->hdr_size = (packet->cur_pos - packet->data);
-
-    // Leave LL analyzer land
-    return std::make_tuple(AnalyzerResult::Terminate, 0);
-}
+	// Leave LL analyzer land
+	return std::make_tuple(AnalyzerResult::Terminate, 0);
+	}

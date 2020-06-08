@@ -1,28 +1,18 @@
-#ifndef PROTOTYPE_TIMING_H
-#define PROTOTYPE_TIMING_H
+#pragma once
 
 #include <string>
 
 namespace Timing {
-    std::string fmtTime(uint64_t time);
 
-    void startTM(const std::string &identifier);
+std::string FmtTime(uint64_t time);
+void StartTM(const std::string& identifier);
+void EndTM(const std::string& identifier);
+void PrintAllTM();
+void PrintAllTMRelative(const std::string& identifier);
+void PrintAllTMAvg();
+void PrintAllTMAvgRelative(const std::string& identifier);
+void PrintAllTMOPS();
+void PrintAllTMOPSRelative(const std::string& identifier);
+void ToCSV(const std::string& name);
 
-    void endTM(const std::string &identifier);
-
-    void printAllTM();
-
-    void printAllTMRelative(const std::string &identifier);
-
-    void printAllTMAvg();
-
-    void printAllTMAvgRelative(const std::string &identifier);
-
-    void printAllTMOPS();
-
-    void printAllTMOPSRelative(const std::string &identifier);
-
-    void toCSV(const std::string &name);
 }
-
-#endif //PROTOTYPE_TIMING_H

@@ -3,18 +3,19 @@
 #include <llanalyzer/Analyzer.h>
 #include <llanalyzer/Component.h>
 
-namespace llanalyzer { namespace Ethernet {
+namespace zeek::llanalyzer::Ethernet {
 
 class EthernetAnalyzer : public Analyzer {
 public:
     EthernetAnalyzer();
-    ~EthernetAnalyzer() override;
+	~EthernetAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
+    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate() {
-        return new EthernetAnalyzer();
-    }
+    static Analyzer* Instantiate()
+		{
+		return new EthernetAnalyzer();
+		}
 };
 
-} }
+}

@@ -1,7 +1,7 @@
 
 include(ZeekPlugin)
 
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(BEFORE $ {CMAKE_CURRENT_SOURCE_DIR} $ {CMAKE_CURRENT_BINARY_DIR})
 
 zeek_plugin_begin(LLPOC ARP)
 zeek_plugin_cc(ARP.cc Plugin.cc)

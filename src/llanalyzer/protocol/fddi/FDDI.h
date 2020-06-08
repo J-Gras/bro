@@ -3,18 +3,19 @@
 #include <llanalyzer/Analyzer.h>
 #include <llanalyzer/Component.h>
 
-namespace llanalyzer { namespace FDDI {
+namespace zeek::llanalyzer::FDDI {
 
-class FDDIAnalyzer : public Analyzer {
+class FDDIAnalyzer : public zeek::llanalyzer::Analyzer {
 public:
     FDDIAnalyzer();
-    ~FDDIAnalyzer() override;
+    ~FDDIAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
+    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate() {
-        return new FDDIAnalyzer();
-    }
+	static zeek::llanalyzer::Analyzer* Instantiate()
+		{
+		return new FDDIAnalyzer();
+		}
 };
 
-} }
+}

@@ -1,7 +1,6 @@
 // See the file "COPYING" in the main distribution directory for copyright.
 
-#ifndef ANALYZER_MANAGER_H
-#define ANALYZER_MANAGER_H
+#pragma once
 
 #include <queue>
 #include <vector>
@@ -11,11 +10,13 @@
 #include "Component.h"
 #include "AnalyzerSet.h"
 #include "plugin/ComponentManager.h"
+#include "iosource/Packet.h"
 
 #include "../Dict.h"
 #include "../net_util.h"
 
-namespace llanalyzer {
+namespace zeek::llanalyzer {
+
 class AnalyzerSet;
 
 class Manager : public plugin::ComponentManager<Tag, Component> {
@@ -29,12 +30,6 @@ public:
 	 * Destructor.
 	 */
 	~Manager();
-
-	/**
-	 * First-stage initializion of the manager. This is called early on
-	 * during Bro's initialization, before any scripts are processed.
-	 */
-	void InitPreScript();
 
 	/**
 	 * Second-stage initialization of the manager. This is called late
@@ -163,11 +158,9 @@ protected:
     void CustomEncapsulationSkip(Packet* packet);
 
 private:
-    AnalyzerSet* analyzerSet;
+    AnalyzerSet* analyzer_set = nullptr;
 };
 
 }
 
-extern llanalyzer::Manager* llanalyzer_mgr;
-
-#endif
+extern zeek::llanalyzer::Manager* llanalyzer_mgr;

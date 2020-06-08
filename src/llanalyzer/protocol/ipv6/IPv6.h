@@ -3,18 +3,19 @@
 #include <llanalyzer/Analyzer.h>
 #include <llanalyzer/Component.h>
 
-namespace llanalyzer { namespace IPv6 {
+namespace zeek::llanalyzer::IPv6 {
 
 class IPv6Analyzer : public Analyzer {
 public:
-    IPv6Analyzer();
-    ~IPv6Analyzer() override;
+	IPv6Analyzer();
+	~IPv6Analyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate() {
-        return new IPv6Analyzer();
-    }
+	static Analyzer* Instantiate()
+		{
+		return new IPv6Analyzer();
+		}
 };
 
-} }
+}

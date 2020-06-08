@@ -3,18 +3,19 @@
 #include <llanalyzer/Analyzer.h>
 #include <llanalyzer/Component.h>
 
-namespace llanalyzer { namespace ARP {
+namespace zeek::llanalyzer::ARP {
 
 class ARPAnalyzer : public Analyzer {
 public:
-    ARPAnalyzer();
-    ~ARPAnalyzer() override;
+	ARPAnalyzer();
+	~ARPAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate() {
-        return new ARPAnalyzer();
-    }
+	static Analyzer* Instantiate()
+		{
+		return new ARPAnalyzer();
+		}
 };
 
-} }
+}

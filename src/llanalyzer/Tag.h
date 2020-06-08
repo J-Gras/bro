@@ -8,96 +8,99 @@
 class EnumVal;
 
 namespace plugin {
-template <class T>
-class TaggedComponent;
-template <class T, class C>
-class ComponentManager;
+	template <class T>
+	class TaggedComponent;
+	template <class T, class C>
+	class ComponentManager;
 }
 
-namespace llanalyzer {
-    class Manager;
-    class Component;
+namespace zeek::llanalyzer {
+
+class Manager;
+class Component;
 
 /**
  * Class to identify a protocol analyzer type.
  */
 class Tag : public ::Tag {
 public:
-    /*
+	/*
      * Copy constructor.
      */
-    Tag(const Tag &other) : ::Tag(other) {}
+	Tag(const Tag& other) : ::Tag(other) { }
 
-    /**
+	/**
      * Default constructor. This initializes the tag with an error value
      * that will make \c operator \c bool return false.
      */
-    Tag() : ::Tag() {}
+	Tag() : ::Tag() { }
 
-    /**
+	/**
      * Destructor.
      */
-    ~Tag() = default;
+	~Tag() = default;
 
-    /**
+	/**
      * Returns false if the tag represents an error value rather than a
      * legal analyzer type.
      */
-    explicit operator bool() const { return *this != Tag(); }
+	explicit operator bool() const { return *this != Tag(); }
 
-    /**
+	/**
      * Assignment operator.
      */
-    Tag &operator=(const Tag &other);
+	Tag& operator=(const Tag& other);
 
-    /**
+	/**
      * Compares two tags for equality.
      */
-    bool operator==(const Tag &other) const {
-        return ::Tag::operator==(other);
-    }
+	bool operator==(const Tag& other) const
+		{
+		return ::Tag::operator==(other);
+		}
 
-    /**
+	/**
      * Compares two tags for inequality.
      */
-    bool operator!=(const Tag &other) const {
-        return ::Tag::operator!=(other);
-    }
+	bool operator!=(const Tag& other) const
+		{
+		return ::Tag::operator!=(other);
+		}
 
-    /**
+	/**
      * Compares two tags for less-than relationship.
      */
-    bool operator<(const Tag &other) const {
-        return ::Tag::operator<(other);
-    }
+	bool operator<(const Tag& other) const
+		{
+		return ::Tag::operator<(other);
+		}
 
-    /**
+	/**
      * Returns the \c Analyzer::Tag enum that corresponds to this tag.
      * The returned value does not have its ref-count increased.
      *
      * @param etype the script-layer enum type associated with the tag.
      */
-    const IntrusivePtr<EnumVal>& AsVal() const;
+	const IntrusivePtr<EnumVal>& AsVal() const;
 
-    /**
+	/**
      * Returns the \c Analyzer::Tag enum that corresponds to this tag.
      * The returned value does not have its ref-count increased.
      *
      * @param etype the script-layer enum type associated with the tag.
      */
-    [[deprecated("Remove in v4.1.  Use AsVal() instead.")]]
-    EnumVal *AsEnumVal() const;
+	[[deprecated("Remove in v4.1.  Use AsVal() instead.")]]
+	EnumVal* AsEnumVal() const;
 
-    static Tag Error;
+	static Tag Error;
 
 protected:
-    friend class llanalyzer::Manager;
 
-    friend class plugin::ComponentManager<Tag, Component>;
+	friend class llanalyzer::Manager;
+	friend class plugin::ComponentManager<Tag, Component>;
+	friend class plugin::TaggedComponent<Tag>;
 
-    friend class plugin::TaggedComponent<Tag>;
-
-    /**
+	/**
      * Constructor.
      *
      * @param type The main type. Note that the \a llanalyzer::Manager
@@ -107,17 +110,17 @@ protected:
      * @param subtype The sub type, which is left to an analyzer for
      * interpretation. By default it's set to zero.
      */
-    explicit Tag(type_t type, subtype_t subtype = 0);
+	explicit Tag(type_t type, subtype_t subtype = 0);
 
-    /**
+	/**
      * Constructor.
      *
      * @param val An enum value of script type \c Analyzer::Tag.
      */
-    explicit Tag(IntrusivePtr<EnumVal> val);
-  
-    [[deprecated("Remove in v4.1.  Construct from IntrusivePtr instead")]]
-    explicit Tag(EnumVal* val);
+	explicit Tag(IntrusivePtr<EnumVal> val);
+
+	[[deprecated("Remove in v4.1.  Construct from IntrusivePtr instead")]]
+	explicit Tag(EnumVal* val);
 };
 
 }

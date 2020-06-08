@@ -1,13 +1,14 @@
 #include "NFLog.h"
 #include "NetVar.h"
 
-using namespace llanalyzer::NFLog;
+using namespace zeek::llanalyzer::NFLog;
 
-NFLogAnalyzer::NFLogAnalyzer() : llanalyzer::Analyzer("NFLogAnalyzer") { }
+NFLogAnalyzer::NFLogAnalyzer()
+	: zeek::llanalyzer::Analyzer("NFLogAnalyzer")
+	{
+	}
 
-NFLogAnalyzer::~NFLogAnalyzer() = default;
-
-std::tuple<llanalyzer::AnalyzerResult, llanalyzer::identifier_t> NFLogAnalyzer::analyze(Packet* packet) {
+std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> NFLogAnalyzer::Analyze(Packet* packet) {
     auto& pdata = packet->cur_pos;
     auto end_of_data = packet->GetEndOfData();
 
