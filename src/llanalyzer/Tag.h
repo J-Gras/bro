@@ -1,15 +1,18 @@
 // See the file "COPYING" in the main distribution directory for copyright.
 
-#ifndef ANALYZER_TAG_H
-#define ANALYZER_TAG_H
+#pragma once
 
 #include "zeek-config.h"
-#include "util.h"
 #include "../Tag.h"
-#include "../plugin/TaggedComponent.h"
-#include "../plugin/ComponentManager.h"
 
 class EnumVal;
+
+namespace plugin {
+template <class T>
+class TaggedComponent;
+template <class T, class C>
+class ComponentManager;
+}
 
 namespace llanalyzer {
     class Manager;
@@ -74,6 +77,15 @@ public:
      *
      * @param etype the script-layer enum type associated with the tag.
      */
+    const IntrusivePtr<EnumVal>& AsVal() const;
+
+    /**
+     * Returns the \c Analyzer::Tag enum that corresponds to this tag.
+     * The returned value does not have its ref-count increased.
+     *
+     * @param etype the script-layer enum type associated with the tag.
+     */
+    [[deprecated("Remove in v4.1.  Use AsVal() instead.")]]
     EnumVal *AsEnumVal() const;
 
     static Tag Error;
@@ -102,9 +114,10 @@ protected:
      *
      * @param val An enum value of script type \c Analyzer::Tag.
      */
-    explicit Tag(EnumVal *val) : ::Tag(val) {}
+    explicit Tag(IntrusivePtr<EnumVal> val);
+  
+    [[deprecated("Remove in v4.1.  Construct from IntrusivePtr instead")]]
+    explicit Tag(EnumVal* val);
 };
 
 }
-
-#endif
