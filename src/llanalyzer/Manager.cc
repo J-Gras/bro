@@ -32,6 +32,7 @@ void Manager::InitPostScript() {
     configuration.addMapping("ROOT", DLT_PPP_SERIAL, "PPPSerialAnalyzer");
     configuration.addMapping("ROOT", DLT_IEEE802_11, "IEEE802_11Analyzer");
     configuration.addMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
+    configuration.addMapping("ROOT", DLT_FDDI, "FDDIAnalyzer");
     configuration.addMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
     configuration.addMapping("ROOT", DLT_NULL, "NullAnalyzer");
     configuration.addMapping("ROOT", DLT_LINUX_SLL, "LinuxSLLAnalyzer");
