@@ -110,9 +110,9 @@ Dispatcher* ProtocolAnalyzerSet::GetDispatcher(Config& configuration, const std:
 		if ( analyzers.count(current_mapping.second) == 0 )
 			{
 			reporter->InternalWarning("No analyzer %s found for dispatching identifier %#x of %s, ignoring.",
-									  current_mapping.second.c_str(),
-									  current_mapping.first,
-									  dispatcher_name.c_str());
+			                          current_mapping.second.c_str(),
+			                          current_mapping.first,
+			                          dispatcher_name.c_str());
 			continue;
 			}
 

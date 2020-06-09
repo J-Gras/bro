@@ -37,17 +37,17 @@ public:
 	 */
 	void InitPostScript();
 
-    /**
-     * Finished the manager's operations.
-     */
-    void Done();
+	/**
+	 * Finished the manager's operations.
+	 */
+	void Done();
 
-    /**
-     * Dumps out the state of all registered analyzers to the \c analyzer
-     * debug stream. Should be called only after any \c zeek_init events
-     * have executed to ensure that any of their changes are applied.
-     */
-    void DumpDebug(); // Called after zeek_init() events.
+	/**
+	 * Dumps out the state of all registered analyzers to the \c analyzer
+	 * debug stream. Should be called only after any \c zeek_init events
+	 * have executed to ensure that any of their changes are applied.
+	 */
+	void DumpDebug(); // Called after zeek_init() events.
 
 	/**
 	 * Enables an analyzer type. Only enabled analyzers will be
@@ -146,19 +146,20 @@ public:
 	 *
 	 * @param packet The packet to process.
 	 */
-	void processPacket(Packet* packet);
+	void ProcessPacket(Packet* packet);
 
 protected:
-    /**
-     * Skips a fixed amount of packet data that is defined by encap_hdr_size.
-     * It is assumed that an IP header follows.
-     *
-     * @param packet The packet to adapt.
-     */
-    void CustomEncapsulationSkip(Packet* packet);
+	/**
+	 * Skips a fixed amount of packet data that is defined by encap_hdr_size.
+	 * It is assumed that an IP header follows.
+	 *
+	 * @param packet The packet to adapt.
+	 */
+	void CustomEncapsulationSkip(Packet* packet);
 
 private:
-    AnalyzerSet* analyzer_set = nullptr;
+	AnalyzerSet* analyzer_set = nullptr;
+
 };
 
 }

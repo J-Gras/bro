@@ -39,7 +39,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 	bool saw_vlan = false;
 
 	while ( protocol == 0x8100 || protocol == 0x9100 ||
-			protocol == 0x8864 )
+	        protocol == 0x8864 )
 		{
 		switch ( protocol )
 			{

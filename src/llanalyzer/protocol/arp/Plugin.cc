@@ -9,7 +9,7 @@ public:
 	::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("ARPAnalyzer",
-		             zeek::llanalyzer::ARP::ARPAnalyzer::Instantiate));
+		                 zeek::llanalyzer::ARP::ARPAnalyzer::Instantiate));
 
 		::plugin::Configuration config;
 		config.name = "LLPOC::ARPAnalyzer";

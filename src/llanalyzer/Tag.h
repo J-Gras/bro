@@ -25,70 +25,70 @@ class Component;
 class Tag : public ::Tag {
 public:
 	/*
-     * Copy constructor.
-     */
+	 * Copy constructor.
+	 */
 	Tag(const Tag& other) : ::Tag(other) { }
 
 	/**
-     * Default constructor. This initializes the tag with an error value
-     * that will make \c operator \c bool return false.
-     */
+	 * Default constructor. This initializes the tag with an error value
+	 * that will make \c operator \c bool return false.
+	 */
 	Tag() : ::Tag() { }
 
 	/**
-     * Destructor.
-     */
+	 * Destructor.
+	 */
 	~Tag() = default;
 
 	/**
-     * Returns false if the tag represents an error value rather than a
-     * legal analyzer type.
-     */
+	 * Returns false if the tag represents an error value rather than a
+	 * legal analyzer type.
+	 */
 	explicit operator bool() const { return *this != Tag(); }
 
 	/**
-     * Assignment operator.
-     */
+	 * Assignment operator.
+	 */
 	Tag& operator=(const Tag& other);
 
 	/**
-     * Compares two tags for equality.
-     */
+	 * Compares two tags for equality.
+	 */
 	bool operator==(const Tag& other) const
 		{
 		return ::Tag::operator==(other);
 		}
 
 	/**
-     * Compares two tags for inequality.
-     */
+	 * Compares two tags for inequality.
+	 */
 	bool operator!=(const Tag& other) const
 		{
 		return ::Tag::operator!=(other);
 		}
 
 	/**
-     * Compares two tags for less-than relationship.
-     */
+	 * Compares two tags for less-than relationship.
+	 */
 	bool operator<(const Tag& other) const
 		{
 		return ::Tag::operator<(other);
 		}
 
 	/**
-     * Returns the \c Analyzer::Tag enum that corresponds to this tag.
-     * The returned value does not have its ref-count increased.
-     *
-     * @param etype the script-layer enum type associated with the tag.
-     */
+	 * Returns the \c Analyzer::Tag enum that corresponds to this tag.
+	 * The returned value does not have its ref-count increased.
+	 *
+	 * @param etype the script-layer enum type associated with the tag.
+	 */
 	const IntrusivePtr<EnumVal>& AsVal() const;
 
 	/**
-     * Returns the \c Analyzer::Tag enum that corresponds to this tag.
-     * The returned value does not have its ref-count increased.
-     *
-     * @param etype the script-layer enum type associated with the tag.
-     */
+	 * Returns the \c Analyzer::Tag enum that corresponds to this tag.
+	 * The returned value does not have its ref-count increased.
+	 *
+	 * @param etype the script-layer enum type associated with the tag.
+	 */
 	[[deprecated("Remove in v4.1.  Use AsVal() instead.")]]
 	EnumVal* AsEnumVal() const;
 
@@ -101,22 +101,22 @@ protected:
 	friend class plugin::TaggedComponent<Tag>;
 
 	/**
-     * Constructor.
-     *
-     * @param type The main type. Note that the \a llanalyzer::Manager
-     * manages the value space internally, so noone else should assign
-     * any main types.
-     *
-     * @param subtype The sub type, which is left to an analyzer for
-     * interpretation. By default it's set to zero.
-     */
+	 * Constructor.
+	 *
+	 * @param type The main type. Note that the \a llanalyzer::Manager
+	 * manages the value space internally, so noone else should assign
+	 * any main types.
+	 *
+	 * @param subtype The sub type, which is left to an analyzer for
+	 * interpretation. By default it's set to zero.
+	 */
 	explicit Tag(type_t type, subtype_t subtype = 0);
 
 	/**
-     * Constructor.
-     *
-     * @param val An enum value of script type \c Analyzer::Tag.
-     */
+	 * Constructor.
+	 *
+	 * @param val An enum value of script type \c Analyzer::Tag.
+	 */
 	explicit Tag(IntrusivePtr<EnumVal> val);
 
 	[[deprecated("Remove in v4.1.  Construct from IntrusivePtr instead")]]

@@ -9,7 +9,7 @@ public:
 	::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("LinuxSLLAnalyzer",
-		             zeek::llanalyzer::LinuxSLL::LinuxSLLAnalyzer::Instantiate));
+		                 zeek::llanalyzer::LinuxSLL::LinuxSLLAnalyzer::Instantiate));
 
 		::plugin::Configuration config;
 		config.name = "LLPOC::LinuxSLLAnalyzer";

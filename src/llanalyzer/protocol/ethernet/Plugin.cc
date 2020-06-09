@@ -6,15 +6,15 @@ namespace zeek::plugin::LLPOC_Ethernet {
 
 class Plugin : public ::plugin::Plugin {
 public:
-    ::plugin::Configuration Configure()
+	::plugin::Configuration Configure()
 		{
-        AddComponent(new zeek::llanalyzer::Component("EthernetAnalyzer",
-		             zeek::llanalyzer::Ethernet::EthernetAnalyzer::Instantiate));
+		AddComponent(new zeek::llanalyzer::Component("EthernetAnalyzer",
+		                 zeek::llanalyzer::Ethernet::EthernetAnalyzer::Instantiate));
 
-        ::plugin::Configuration config;
-        config.name = "LLPOC::EthernetAnalyzer";
-        config.description = "A wrapper for the original zeek code.";
-        return config;
+		::plugin::Configuration config;
+		config.name = "LLPOC::EthernetAnalyzer";
+		config.description = "A wrapper for the original zeek code.";
+		return config;
 		}
 
 } plugin;

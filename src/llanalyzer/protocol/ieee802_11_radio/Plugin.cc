@@ -6,10 +6,10 @@ namespace zeek::plugin::LLPOC_IEEE802_11_Radio {
 
 class Plugin : public ::plugin::Plugin {
 public:
-    ::plugin::Configuration Configure()
+	::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("IEEE802_11_RadioAnalyzer",
-		             zeek::llanalyzer::IEEE802_11_Radio::IEEE802_11_RadioAnalyzer::Instantiate));
+		                 zeek::llanalyzer::IEEE802_11_Radio::IEEE802_11_RadioAnalyzer::Instantiate));
 
 		::plugin::Configuration config;
 		config.name = "LLPOC::IEEE802_11_RadioAnalyzer";

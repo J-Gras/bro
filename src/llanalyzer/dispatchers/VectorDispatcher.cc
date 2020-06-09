@@ -58,9 +58,9 @@ void VectorDispatcher::Register(const register_map& data)
 	// Search smallest and largest identifier and resize vector
 	const auto& lowest_new =
 		std::min_element(data.begin(), data.end(),
-						 [](const register_pair& a, const register_pair& b) {
-							 return a.first < b.first;
-						 });
+		                 [](const register_pair& a, const register_pair& b) {
+			                 return a.first < b.first;
+			                 });
 
 	// Register lowest first in order to do shifting only once
 	Register(lowest_new->first, lowest_new->second.first, lowest_new->second.second);

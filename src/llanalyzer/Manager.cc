@@ -211,7 +211,7 @@ Analyzer* Manager::InstantiateAnalyzer(const Tag& tag)
 	if ( tag != a->GetAnalyzerTag() )
 		{
 		reporter->InternalError("Mismatch of requested analyzer %s and instantiated analyzer %s. This usually means that the plugin author made a mistake.",
-								GetComponentName(tag).c_str(), GetComponentName(a->GetAnalyzerTag()).c_str());
+		                        GetComponentName(tag).c_str(), GetComponentName(a->GetAnalyzerTag()).c_str());
 		return nullptr;
 		}
 
@@ -224,7 +224,7 @@ Analyzer* Manager::InstantiateAnalyzer(const std::string& name)
 	return tag ? InstantiateAnalyzer(tag) : nullptr;
 	}
 
-void Manager::processPacket(Packet* packet)
+void Manager::ProcessPacket(Packet* packet)
 	{
 #ifdef DEBUG
 	static size_t counter = 0;
@@ -249,7 +249,7 @@ void Manager::processPacket(Packet* packet)
 			{
 			case AnalyzerResult::Continue:
 				DBG_LOG(DBG_LLPOC, "Analysis in %s succeded, next layer identifier is %#x.",
-					current_analyzer->GetAnalyzerName(), next_layer_id);
+				        current_analyzer->GetAnalyzerName(), next_layer_id);
 				break;
 			case AnalyzerResult::Terminate:
 				DBG_LOG(DBG_LLPOC, "Done, last found layer identifier was %#x.", next_layer_id);

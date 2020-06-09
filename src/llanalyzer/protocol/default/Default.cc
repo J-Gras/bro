@@ -10,17 +10,17 @@ DefaultAnalyzer::DefaultAnalyzer()
 
 std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> DefaultAnalyzer::Analyze(Packet* packet)
 	{
-    auto& pdata = packet->cur_pos;
+	auto& pdata = packet->cur_pos;
 
-    // Assume we're pointing at IP. Just figure out which version.
-    if ( pdata + sizeof(struct ip) >= packet->GetEndOfData() )
-	    {
-        packet->Weird("default_ll_analyser_failed");
-        return std::make_tuple(AnalyzerResult::Failed, 0);
-	    }
+	// Assume we're pointing at IP. Just figure out which version.
+	if ( pdata + sizeof(struct ip) >= packet->GetEndOfData() )
+		{
+		packet->Weird("default_ll_analyser_failed");
+		return std::make_tuple(AnalyzerResult::Failed, 0);
+		}
 
-    auto ip = (const struct ip *)pdata;
-    identifier_t protocol = ip->ip_v;
+	auto ip = (const struct ip *)pdata;
+	identifier_t protocol = ip->ip_v;
 
-    return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return std::make_tuple(AnalyzerResult::Continue, protocol);
 	}

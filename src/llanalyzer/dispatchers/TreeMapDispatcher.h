@@ -19,6 +19,6 @@ public:
 private:
 	std::map<identifier_t, Value*> table;
 	void FreeValues();
-	};
 
+};
 }

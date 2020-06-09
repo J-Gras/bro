@@ -92,7 +92,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	// The organization code (24bits) needs to also be zero to
 	// indicate that this is encapsulated ethernet.
 	if ( pdata[0] == 0xAA && pdata[1] == 0xAA && pdata[2] == 0x03 &&
-		 pdata[3] == 0 && pdata[4] == 0 && pdata[5] == 0 )
+	     pdata[3] == 0 && pdata[4] == 0 && pdata[5] == 0 )
 		{
 		pdata += 6;
 		}

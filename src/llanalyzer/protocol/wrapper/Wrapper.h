@@ -7,12 +7,12 @@ namespace zeek::llanalyzer::Wrapper {
 
 class WrapperAnalyzer : public Analyzer {
 public:
-    WrapperAnalyzer();
+	WrapperAnalyzer();
 	~WrapperAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate()
+	static Analyzer* Instantiate()
 		{
 		return new WrapperAnalyzer();
 		}

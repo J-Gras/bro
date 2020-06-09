@@ -83,7 +83,7 @@ void Timing::PrintAllTM()
 	size_t padding = GetPadding();
 
 	std::cout << std::endl
-			  << "##### TIMINGS #####" << std::endl;
+	          << "##### TIMINGS #####" << std::endl;
 
 	std::cout << std::setprecision(2) << std::fixed;
 	for ( const auto& entry : measurements )
@@ -113,7 +113,7 @@ void Timing::PrintAllTMRelative(const std::string& identifier)
 	size_t padding = GetPadding();
 
 	std::cout << std::endl
-			  << "##### TIMINGS #####" << std::endl;
+	          << "##### TIMINGS #####" << std::endl;
 	int64_t base_time = measurements[identifier];
 	std::cout << std::left << std::setfill(' ') << std::setw(padding) << identifier << " - " << std::right;
 	std::cout << FmtTime(base_time) << std::endl;
@@ -122,7 +122,7 @@ void Timing::PrintAllTMRelative(const std::string& identifier)
 	for ( const auto& entry : measurements )
 		{
 		if ( entry.first == identifier )
- 			continue;
+			continue;
 
 		int64_t new_time = entry.second;
 		std::cout << std::left << std::setfill(' ') << std::setw(padding) << entry.first << std::right;
@@ -152,7 +152,7 @@ void Timing::PrintAllTMAvg()
 	size_t padding = GetPadding();
 
 	std::cout << std::endl
-			  << "##### TIME PER OPERATION #####" << std::endl;
+	          << "##### TIME PER OPERATION #####" << std::endl;
 	std::cout << std::setprecision(2) << std::fixed;
 	for ( const auto& current : measurements )
 		{
@@ -188,7 +188,7 @@ void Timing::PrintAllTMAvgRelative(const std::string& identifier)
 	size_t padding = GetPadding();
 
 	std::cout << std::endl
-			  << "##### TIME PER OPERATION #####" << std::endl;
+	          << "##### TIME PER OPERATION #####" << std::endl;
 	int64_t base_avg = measurements[identifier] / num_measurements[identifier];
 	std::cout << std::left << std::setfill(' ') << std::setw(padding) << identifier << " - " << std::right;
 	std::cout << FmtTime(base_avg) << std::endl;
@@ -228,7 +228,7 @@ void Timing::PrintAllTMOPS()
 	size_t padding = GetPadding();
 
 	std::cout << std::endl
-			  << "##### OPERATIONS PER SECOND #####" << std::endl;
+	          << "##### OPERATIONS PER SECOND #####" << std::endl;
 	std::cout << std::setprecision(2) << std::fixed;
 	for ( const auto& current : measurements )
 		{
@@ -266,7 +266,7 @@ void Timing::PrintAllTMOPSRelative(const std::string& identifier)
 	size_t padding = GetPadding();
 
 	std::cout << std::endl
-			  << "##### OPERATIONS PER SECOND #####" << std::endl;
+	          << "##### OPERATIONS PER SECOND #####" << std::endl;
 	int64_t base_ops = num_measurements[identifier] / (measurements[identifier] / 1E9);
 	std::cout << std::left << std::setfill(' ') << std::setw(padding) << identifier << " - " << std::right;
 	std::cout.imbue(std::locale(""));
@@ -319,7 +319,7 @@ void Timing::ToCSV(const std::string& name)
 	for ( const auto& current : measurements )
 		{
 		csv << current.first << "," << current.second << "," << current.second / num_measurements.at(current.first)
-			<< "," << static_cast<int64_t>(num_measurements.at(current.first) / (current.second / 1E9)) << std::endl;
+		    << "," << static_cast<int64_t>(num_measurements.at(current.first) / (current.second / 1E9)) << std::endl;
 		}
 
 	csv.close();

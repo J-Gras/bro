@@ -6,10 +6,10 @@ namespace zeek::plugin::LLPOC_FDDI {
 
 class Plugin : public ::plugin::Plugin {
 public:
-    ::plugin::Configuration Configure()
+	::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("FDDIAnalyzer",
-		             zeek::llanalyzer::FDDI::FDDIAnalyzer::Instantiate));
+		                 zeek::llanalyzer::FDDI::FDDIAnalyzer::Instantiate));
 
 		::plugin::Configuration config;
 		config.name = "LLPOC::FDDIAnalyzer";

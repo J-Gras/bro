@@ -23,8 +23,8 @@ private:
 		uint16_t packet_type;
 		uint16_t arphrd_type;
 		uint16_t addr_len;
-		uint64_t addr;
 		uint16_t protocol_type;
+		uint64_t addr;
 		} __attribute__((__packed__));
 };
 

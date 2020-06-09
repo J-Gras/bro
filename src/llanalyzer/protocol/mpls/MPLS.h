@@ -7,12 +7,12 @@ namespace zeek::llanalyzer::MPLS {
 
 class MPLSAnalyzer : public zeek::llanalyzer::Analyzer {
 public:
-    MPLSAnalyzer();
+	MPLSAnalyzer();
 	~MPLSAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static zeek::llanalyzer::Analyzer* Instantiate()
+	static zeek::llanalyzer::Analyzer* Instantiate()
 		{
 		return new MPLSAnalyzer();
 		}

@@ -56,11 +56,11 @@ private:
 	void Rehash(const std::vector<pair_t>& intermediate);
 
 	/**
-     * Tries to find a collision free hash function with the current number of buckets.
-     *
-     * @param intermediate The key-value set to store in the hashtable.
-     * @return true, iff it found a collision-free hash function.
-     */
+	 * Tries to find a collision free hash function with the current number of buckets.
+	 *
+	 * @param intermediate The key-value set to store in the hashtable.
+	 * @return true, iff it found a collision-free hash function.
+	 */
 	bool FindCollisionFreeHashFunction(const std::vector<pair_t>& intermediate);
 
 	[[nodiscard]] inline uint64_t Hash(const uint64_t value) const
@@ -72,7 +72,7 @@ private:
 		{
 		do {
 			a = distribution_a(generator);
-		} while ( a % 2 == 0 );
+			} while ( a % 2 == 0 );
 
 		b = distribution_b(generator);
 		}

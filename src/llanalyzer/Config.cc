@@ -21,8 +21,8 @@ void DispatcherConfig::AddMapping(identifier_t identifier,
 	{
 	if ( mappings.count(identifier) )
 		reporter->InternalError("Invalid config, identifier %x does already exist "
-								"for dispatcher set %s.",
-								identifier, name.c_str());
+		                        "for dispatcher set %s.",
+		                        identifier, name.c_str());
 
 	mappings.emplace(identifier, analyzer_name);
 	}
@@ -47,7 +47,7 @@ Config::GetDispatcherConfig(const std::string& name)
 		dispatchers.begin(), dispatchers.end(),
 		[&](const DispatcherConfig& conf) {
 			return conf.GetName() == name;
-		});
+			});
 
 	if ( it == dispatchers.end() )
 		return {};

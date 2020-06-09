@@ -2,8 +2,7 @@
 
 namespace zeek::llanalyzer {
 
-UniversalDispatcher::UniversalDispatcher()
-	: generator(rd())
+UniversalDispatcher::UniversalDispatcher() : generator(rd())
 	{
 	SetBins(2);
 
@@ -26,8 +25,8 @@ bool UniversalDispatcher::Register(identifier_t identifier, Analyzer* analyzer, 
 	{
 #if DEBUG > 1
 	std::shared_ptr<void> deferred(nullptr, [=](...) {
-		std::cout << "Inserted " << identifier << std::endl;
-	});
+		                                        std::cout << "Inserted " << identifier << std::endl;
+		                                        });
 #endif
 
 	uint64_t hashed_id = Hash(identifier);
@@ -54,22 +53,22 @@ bool UniversalDispatcher::Register(identifier_t identifier, Analyzer* analyzer, 
 	return false;
 	}
 
-void UniversalDispatcher::Register(const register_map& data)
-	{
-	// Analyzer already registered
-	for ( const auto& current : data )
+	void UniversalDispatcher::Register(const register_map& data)
 		{
-		if ( table[Hash(current.first)].second != nullptr )
-			throw std::invalid_argument("Analyzer " + std::to_string(current.first) + " already registered!");
+		// Analyzer already registered
+		for ( const auto& current : data )
+			{
+			if ( table[Hash(current.first)].second != nullptr )
+				throw std::invalid_argument("Analyzer " + std::to_string(current.first) + " already registered!");
+			}
+
+		// Create intermediate representation of current analyzer set, then add all new ones
+		std::vector<pair_t> intermediate = CreateIntermediate();
+		for ( const auto& current : data )
+			intermediate.emplace_back(current.first, new Value(current.second.first, current.second.second));
+
+		Rehash(intermediate);
 		}
-
-	// Create intermediate representation of current analyzer set, then add all new ones
-	std::vector<pair_t> intermediate = CreateIntermediate();
-	for ( const auto& current : data )
-		intermediate.emplace_back(current.first, new Value(current.second.first, current.second.second));
-
-	Rehash(intermediate);
-	}
 
 Value* UniversalDispatcher::Lookup(identifier_t identifier) const
 	{

@@ -7,12 +7,12 @@ namespace zeek::llanalyzer::IPv4 {
 
 class IPv4Analyzer : public Analyzer {
 public:
-    IPv4Analyzer();
-    ~IPv4Analyzer() override = default;
+	IPv4Analyzer();
+	~IPv4Analyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate()
+	static Analyzer* Instantiate()
 		{
 		return new IPv4Analyzer();
 		}

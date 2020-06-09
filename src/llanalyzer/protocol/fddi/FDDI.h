@@ -7,10 +7,10 @@ namespace zeek::llanalyzer::FDDI {
 
 class FDDIAnalyzer : public zeek::llanalyzer::Analyzer {
 public:
-    FDDIAnalyzer();
-    ~FDDIAnalyzer() override = default;
+	FDDIAnalyzer();
+	~FDDIAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
 	static zeek::llanalyzer::Analyzer* Instantiate()
 		{

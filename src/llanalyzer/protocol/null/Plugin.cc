@@ -9,13 +9,14 @@ public:
 	::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("NullAnalyzer",
-		             zeek::llanalyzer::Null::NullAnalyzer::Instantiate));
+		                 zeek::llanalyzer::Null::NullAnalyzer::Instantiate));
 
 		::plugin::Configuration config;
 		config.name = "LLPOC::NullAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}
+
 } plugin;
 
 }

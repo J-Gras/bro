@@ -7,14 +7,14 @@ namespace zeek::llanalyzer::Default {
 
 class DefaultAnalyzer : public Analyzer {
 public:
-    DefaultAnalyzer();
-    ~DefaultAnalyzer() override = default;
+	DefaultAnalyzer();
+	~DefaultAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate()
+	static Analyzer* Instantiate()
 		{
-        return new DefaultAnalyzer();
+		return new DefaultAnalyzer();
 		}
 };
 

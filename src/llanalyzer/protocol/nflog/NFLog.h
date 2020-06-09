@@ -7,12 +7,12 @@ namespace zeek::llanalyzer::NFLog {
 
 class NFLogAnalyzer : public Analyzer {
 public:
-    NFLogAnalyzer();
+	NFLogAnalyzer();
 	~NFLogAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate()
+	static Analyzer* Instantiate()
 		{
 		return new NFLogAnalyzer();
 		}
