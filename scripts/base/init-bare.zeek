@@ -5272,3 +5272,5 @@ const digest_salt = "Please change this value." &redef;
 global done_with_network = F;
 event net_done(t: time)
 	{ done_with_network = T; }
+
+@load base/llanalyzer-mapping

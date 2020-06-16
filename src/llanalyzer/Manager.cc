@@ -23,53 +23,17 @@ Manager::~Manager()
 
 void Manager::InitPostScript()
 	{
-	// Read in configuration
-	// TODO: just a mockup now, do for real
+	auto llanalyzer_mapping = zeek::id::find_val<VectorVal>("llanalyzer_mapping");
+
 	Config configuration;
-	//configuration.AddMapping("ROOT", DLT_EN10MB, "WrapperAnalyzer");
-	configuration.AddMapping("ROOT", DLT_EN10MB, "EthernetAnalyzer");
-	configuration.AddMapping("ROOT", DLT_PPP_SERIAL, "PPPSerialAnalyzer");
-	configuration.AddMapping("ROOT", DLT_IEEE802_11, "IEEE802_11Analyzer");
-	configuration.AddMapping("ROOT", DLT_IEEE802_11_RADIO, "IEEE802_11_RadioAnalyzer");
-	configuration.AddMapping("ROOT", DLT_FDDI, "FDDIAnalyzer");
-	configuration.AddMapping("ROOT", DLT_NFLOG, "NFLogAnalyzer");
-	configuration.AddMapping("ROOT", DLT_NULL, "NullAnalyzer");
-	configuration.AddMapping("ROOT", DLT_LINUX_SLL, "LinuxSLLAnalyzer");
+	for (unsigned int i = 0; i < llanalyzer_mapping->Size(); i++)
+		{
+		auto* rv = llanalyzer_mapping->At(i)->AsRecordVal();
 
-	configuration.AddMapping("DefaultAnalyzer", 4, "IPv4Analyzer");
-	configuration.AddMapping("DefaultAnalyzer", 6, "IPv6Analyzer");
-
-	configuration.AddMapping("EthernetAnalyzer", 0x8847, "MPLSAnalyzer");
-	configuration.AddMapping("IEEE802_11_RadioAnalyzer", DLT_IEEE802_11, "IEEE802_11Analyzer");
-
-	configuration.AddMapping("PPPSerialAnalyzer", 0x0281, "MPLSAnalyzer");
-	configuration.AddMapping("PPPSerialAnalyzer", 0x0021, "IPv4Analyzer");
-	configuration.AddMapping("PPPSerialAnalyzer", 0x0057, "IPv6Analyzer");
-
-	configuration.AddMapping("IEEE802_11Analyzer", 0x0800, "IPv4Analyzer");
-	configuration.AddMapping("IEEE802_11Analyzer", 0x86DD, "IPv6Analyzer");
-	configuration.AddMapping("IEEE802_11Analyzer", 0x0806, "ARPAnalyzer");
-	configuration.AddMapping("IEEE802_11Analyzer", 0x8035, "ARPAnalyzer"); //RARP
-
-	configuration.AddMapping("NFLogAnalyzer", AF_INET, "IPv4Analyzer");
-	configuration.AddMapping("NFLogAnalyzer", AF_INET6, "IPv6Analyzer");
-
-	configuration.AddMapping("NullAnalyzer", AF_INET, "IPv4Analyzer");
-	// From the Wireshark Wiki: "AF_INET6, unfortunately, has
-	// different values in {NetBSD,OpenBSD,BSD/OS},
-	// {FreeBSD,DragonFlyBSD}, and {Darwin/Mac OS X}, so an IPv6
-	// packet might have a link-layer header with 24, 28, or 30
-	// as the AF_ value." As we may be reading traces captured on
-	// platforms other than what we're running on, we accept them
-	// all here.
-	configuration.AddMapping("NullAnalyzer", 24, "IPv6Analyzer");
-	configuration.AddMapping("NullAnalyzer", 28, "IPv6Analyzer");
-	configuration.AddMapping("NullAnalyzer", 30, "IPv6Analyzer");
-
-	configuration.AddMapping("LinuxSLLAnalyzer", 0x0800, "IPv4Analyzer");
-	configuration.AddMapping("LinuxSLLAnalyzer", 0x86DD, "IPv6Analyzer");
-	configuration.AddMapping("LinuxSLLAnalyzer", 0x0806, "ARPAnalyzer");
-	configuration.AddMapping("LinuxSLLAnalyzer", 0x8035, "ARPAnalyzer"); //RARP
+		configuration.AddMapping(rv->GetField("parent")->AsStringVal()->ToStdString(),
+		                         rv->GetField("identifier")->AsCount(),
+		                         rv->GetField("analyzer")->AsStringVal()->ToStdString());
+		}
 
 	analyzer_set = new ProtocolAnalyzerSet(configuration, "DefaultAnalyzer");
 	}
