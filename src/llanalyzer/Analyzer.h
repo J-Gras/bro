@@ -8,6 +8,17 @@
 
 namespace zeek::llanalyzer {
 
+/**
+ * Result of low layer analysis.
+ */
+enum class AnalyzerResult {
+	Failed,   // Analysis failed
+	Continue, // Analysis succeded and an encapuslated protocol was determined
+	Terminate // Analysis succeded and there is no further analysis to do
+};
+
+using AnalysisResultTuple = std::tuple<AnalyzerResult, identifier_t>;
+
 class Analyzer {
 public:
 	/**

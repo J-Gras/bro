@@ -25,8 +25,13 @@ ProtocolAnalyzerSet::ProtocolAnalyzerSet(Config& configuration, const std::strin
 		reporter->InternalError("No dispatching configuration for ROOT of llanalyzer set.");
 
 	// Set up default analysis
+	auto it = analyzers.find(default_analyzer_name);
+	if ( it != analyzers.end() )
+		default_analyzer = it->second;
+	else
+		default_analyzer = llanalyzer_mgr->InstantiateAnalyzer(default_analyzer_name);
+
 	default_dispatcher = nullptr;
-	default_analyzer = (analyzers.count(default_analyzer_name) != 0) ? analyzers[default_analyzer_name] : llanalyzer_mgr->InstantiateAnalyzer(default_analyzer_name);
 	if ( default_analyzer != nullptr )
 		default_dispatcher = GetDispatcher(configuration, default_analyzer_name);
 
@@ -53,7 +58,9 @@ Analyzer* ProtocolAnalyzerSet::Dispatch(identifier_t identifier)
 	// Because leaf nodes (aka no more dispatching) can still have an existing analyzer that returns more identifiers,
 	// current_state needs to be checked to be not null. In this case there would have been an analyzer dispatched
 	// in the last layer, but no dispatcher for it (end of FSM)
-	const Value* result = (current_state != nullptr) ? current_state->Lookup(identifier) : nullptr;
+	const Value* result = nullptr;
+	if ( current_state )
+		result = current_state->Lookup(identifier);
 
 	if ( result == nullptr )
 		{
@@ -116,7 +123,8 @@ Dispatcher* ProtocolAnalyzerSet::GetDispatcher(Config& configuration, const std:
 			continue;
 			}
 
-		dispatcher->Register(current_mapping.first, analyzers.at(current_mapping.second), GetDispatcher(configuration, current_mapping.second));
+		dispatcher->Register(current_mapping.first, analyzers.at(current_mapping.second),
+		                     GetDispatcher(configuration, current_mapping.second));
 		}
 
 	dispatchers.emplace(dispatcher_name, dispatcher);
