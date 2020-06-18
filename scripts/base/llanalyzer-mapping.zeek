@@ -42,7 +42,18 @@ global llanalyzer_mapping : vector of LLAnalyzerConfigEntry = [
     [$parent="EthernetAnalyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
     [$parent="EthernetAnalyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
     [$parent="EthernetAnalyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"],
+    [$parent="EthernetAnalyzer", $identifier=0x8100, $analyzer="VLANAnalyzer"],
+    [$parent="EthernetAnalyzer", $identifier=0x88A8, $analyzer="VLANAnalyzer"],
+    [$parent="EthernetAnalyzer", $identifier=0x9100, $analyzer="VLANAnalyzer"],
     [$parent="EthernetAnalyzer", $identifier=0x8864, $analyzer="PPPoEAnalyzer"],
+
+     [$parent="VLANAnalyzer", $identifier=0x8847, $analyzer="MPLSAnalyzer"],
+     [$parent="VLANAnalyzer", $identifier=0x0800, $analyzer="IPv4Analyzer"],
+     [$parent="VLANAnalyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
+     [$parent="VLANAnalyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
+     [$parent="VLANAnalyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"],
+     [$parent="VLANAnalyzer", $identifier=0x8100, $analyzer="VLANAnalyzer"],
+     [$parent="VLANAnalyzer", $identifier=0x8864, $analyzer="PPPoEAnalyzer"],
 
     [$parent="PPPoEAnalyzer", $identifier=0x0021, $analyzer="IPv4Analyzer"],
     [$parent="PPPoEAnalyzer", $identifier=0x0057, $analyzer="IPv6Analyzer"],

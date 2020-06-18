@@ -111,6 +111,8 @@ Dispatcher* ProtocolAnalyzerSet::GetDispatcher(Config& configuration, const std:
 	const auto& mappings = dispatcher_config->get().GetMappings();
 
 	Dispatcher* dispatcher = new dispatcher_impl();
+	dispatchers.emplace(dispatcher_name, dispatcher);
+
 	for ( const auto& current_mapping : mappings )
 		{
 		// No analyzer with this name. Report warning and ignore.
@@ -126,8 +128,6 @@ Dispatcher* ProtocolAnalyzerSet::GetDispatcher(Config& configuration, const std:
 		dispatcher->Register(current_mapping.first, analyzers.at(current_mapping.second),
 		                     GetDispatcher(configuration, current_mapping.second));
 		}
-
-	dispatchers.emplace(dispatcher_name, dispatcher);
 
 	return dispatcher;
 	}
