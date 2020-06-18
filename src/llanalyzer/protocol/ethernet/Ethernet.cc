@@ -30,6 +30,10 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 	// Get protocol being carried from the ethernet frame.
 	identifier_t protocol = (pdata[12] << 8) + pdata[13];
 
+	// Skip everything but Ethernet II packets
+	if ( protocol < 1536 )
+	    return std::make_tuple(AnalyzerResult::Terminate, protocol);
+
 	packet->eth_type = protocol;
 	packet->l2_dst = pdata;
 	packet->l2_src = pdata + 6;
