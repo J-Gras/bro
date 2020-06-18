@@ -203,7 +203,10 @@ void Manager::ProcessPacket(Packet* packet)
 
 		// Analyzer not found
 		if ( current_analyzer == nullptr )
+			{
+			packet->Weird("no_suitable_analyzer_found");
 			break;
+			}
 
 		// Analyze this layer and get identifier of next layer protocol
 		std::tie(result, next_layer_id) = current_analyzer->Analyze(packet);

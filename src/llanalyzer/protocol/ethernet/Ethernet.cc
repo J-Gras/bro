@@ -90,30 +90,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 			}
 		}
 
-	// Check for MPLS in VLAN.
-	if ( protocol == 0x8847 )
-		return std::make_tuple(AnalyzerResult::Continue, protocol);
-
-	// Normal path to determine Layer 3 protocol.
-	if ( packet->l3_proto == L3_UNKNOWN )
-		{
-		if ( protocol == 0x800 )
-			packet->l3_proto = L3_IPV4;
-		else if ( protocol == 0x86dd )
-			packet->l3_proto = L3_IPV6;
-		else if ( protocol == 0x0806 || protocol == 0x8035 )
-			packet->l3_proto = L3_ARP;
-		else
-			{
-			// Neither IPv4 nor IPv6.
-			packet->Weird("non_ip_packet_in_ethernet");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
-			}
-		}
-
-	// TODO: investigate how hdr_size is used
-	// Calculate how much header we've used up.
-	packet->hdr_size = (pdata - packet->data);
-
-	return std::make_tuple(AnalyzerResult::Terminate, 0);
+	return std::make_tuple(AnalyzerResult::Continue, protocol);
 	}
