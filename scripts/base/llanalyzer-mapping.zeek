@@ -42,6 +42,10 @@ global llanalyzer_mapping : vector of LLAnalyzerConfigEntry = [
     [$parent="EthernetAnalyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
     [$parent="EthernetAnalyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
     [$parent="EthernetAnalyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"],
+    [$parent="EthernetAnalyzer", $identifier=0x8864, $analyzer="PPPoEAnalyzer"],
+
+    [$parent="PPPoEAnalyzer", $identifier=0x0021, $analyzer="IPv4Analyzer"],
+    [$parent="PPPoEAnalyzer", $identifier=0x0057, $analyzer="IPv6Analyzer"],
 
     [$parent="IEEE802_11_RadioAnalyzer", $identifier=DLT_IEEE802_11, $analyzer="IEEE802_11Analyzer"],
 

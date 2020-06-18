@@ -38,8 +38,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 
 	bool saw_vlan = false;
 
-	while ( protocol == 0x8100 || protocol == 0x9100 ||
-	        protocol == 0x8864 )
+	while ( protocol == 0x8100 || protocol == 0x9100 )
 		{
 		switch ( protocol )
 			{
@@ -60,31 +59,6 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 				pdata += 4; // Skip the vlan header
 				saw_vlan = true;
 				packet->eth_type = protocol;
-				break;
-				}
-
-			// PPPoE carried over the ethernet frame.
-			case 0x8864:
-				{
-				if ( pdata + 8 >= end_of_data )
-					{
-					packet->Weird("truncated_link_header");
-					return std::make_tuple(AnalyzerResult::Failed, 0);
-					}
-
-				protocol = (pdata[6] << 8u) + pdata[7];
-				pdata += 8; // Skip the PPPoE session and PPP header
-
-				if ( protocol == 0x0021 )
-					packet->l3_proto = L3_IPV4;
-				else if ( protocol == 0x0057 )
-					packet->l3_proto = L3_IPV6;
-				else
-					{
-					// Neither IPv4 nor IPv6.
-					packet->Weird("non_ip_packet_in_pppoe_encapsulation");
-					return std::make_tuple(AnalyzerResult::Failed, 0);
-					}
 				break;
 				}
 			}
