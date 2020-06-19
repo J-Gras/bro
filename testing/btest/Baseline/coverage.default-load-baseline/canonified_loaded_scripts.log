@@ -3,7 +3,7 @@
 #empty_field	(empty)
 #unset_field	-
 #path	loaded_scripts
-#open	2020-06-16-19-01-10
+#open	2020-06-19-19-47-57
 #fields	name
 #types	string
 scripts/base/init-bare.zeek
@@ -19,7 +19,39 @@ scripts/base/init-bare.zeek
   build/scripts/base/bif/plugins/Zeek_SNMP.types.bif.zeek
   build/scripts/base/bif/plugins/Zeek_KRB.types.bif.zeek
   build/scripts/base/bif/event.bif.zeek
-  scripts/base/llanalyzer-mapping.zeek
+  scripts/base/llprotocols/__load__.zeek
+    scripts/base/llprotocols/arp/__load__.zeek
+      scripts/base/llprotocols/arp/main.zeek
+    scripts/base/llprotocols/default/__load__.zeek
+      scripts/base/llprotocols/default/main.zeek
+    scripts/base/llprotocols/ethernet/__load__.zeek
+      scripts/base/llprotocols/ethernet/main.zeek
+    scripts/base/llprotocols/fddi/__load__.zeek
+      scripts/base/llprotocols/fddi/main.zeek
+    scripts/base/llprotocols/ieee802_11/__load__.zeek
+      scripts/base/llprotocols/ieee802_11/main.zeek
+    scripts/base/llprotocols/ieee802_11_radio/__load__.zeek
+      scripts/base/llprotocols/ieee802_11_radio/main.zeek
+    scripts/base/llprotocols/ipv4/__load__.zeek
+      scripts/base/llprotocols/ipv4/main.zeek
+    scripts/base/llprotocols/ipv6/__load__.zeek
+      scripts/base/llprotocols/ipv6/main.zeek
+    scripts/base/llprotocols/linux_sll/__load__.zeek
+      scripts/base/llprotocols/linux_sll/main.zeek
+    scripts/base/llprotocols/mpls/__load__.zeek
+      scripts/base/llprotocols/mpls/main.zeek
+    scripts/base/llprotocols/nflog/__load__.zeek
+      scripts/base/llprotocols/nflog/main.zeek
+    scripts/base/llprotocols/null/__load__.zeek
+      scripts/base/llprotocols/null/main.zeek
+    scripts/base/llprotocols/ppp_serial/__load__.zeek
+      scripts/base/llprotocols/ppp_serial/main.zeek
+    scripts/base/llprotocols/pppoe/__load__.zeek
+      scripts/base/llprotocols/pppoe/main.zeek
+    scripts/base/llprotocols/vlan/__load__.zeek
+      scripts/base/llprotocols/vlan/main.zeek
+    scripts/base/llprotocols/wrapper/__load__.zeek
+      scripts/base/llprotocols/wrapper/main.zeek
 scripts/base/init-frameworks-and-bifs.zeek
   scripts/base/frameworks/logging/__load__.zeek
     scripts/base/frameworks/logging/main.zeek
@@ -382,4 +414,4 @@ scripts/base/init-default.zeek
   scripts/base/misc/find-filtered-trace.zeek
   scripts/base/misc/version.zeek
 scripts/policy/misc/loaded-scripts.zeek
-#close	2020-06-16-19-01-10
+#close	2020-06-19-19-47-57

@@ -23,11 +23,13 @@ Manager::~Manager()
 
 void Manager::InitPostScript()
 	{
-	auto llanalyzer_mapping = zeek::id::find("llanalyzer_mapping");
+	auto llanalyzer_mapping = zeek::id::find("LLAnalyzer::config_map");
 	if ( ! llanalyzer_mapping )
 		return;
 
 	auto mapping_val = llanalyzer_mapping->GetVal()->AsVectorVal();
+	if ( mapping_val->Size() == 0 )
+		return;
 
 	Config configuration;
 	for (unsigned int i = 0; i < mapping_val->Size(); i++)
@@ -215,6 +217,7 @@ void Manager::ProcessPacket(Packet* packet)
 		// Analyzer not found
 		if ( current_analyzer == nullptr )
 			{
+			DBG_LOG(DBG_LLPOC, "Could not find analyzer for identifier %#x", next_layer_id);
 			packet->Weird("no_suitable_analyzer_found");
 			break;
 			}

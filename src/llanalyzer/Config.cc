@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "Reporter.h"
+#include "DebugLogger.h"
 
 namespace zeek::llanalyzer {
 
@@ -19,8 +20,11 @@ const std::map<identifier_t, std::string>& DispatcherConfig::GetMappings() const
 void DispatcherConfig::AddMapping(identifier_t identifier,
 								  const std::string& analyzer_name)
 	{
+	DBG_LOG(DBG_LLPOC, "Adding configuration mapping: %s -> %d -> %s",
+	        name.c_str(), identifier, analyzer_name.c_str());
+
 	if ( mappings.count(identifier) )
-		reporter->InternalError("Invalid config, identifier %x does already exist "
+		reporter->InternalError("Invalid config, identifier %x already exists "
 		                        "for dispatcher set %s.",
 		                        identifier, name.c_str());
 
