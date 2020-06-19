@@ -23,16 +23,22 @@ Manager::~Manager()
 
 void Manager::InitPostScript()
 	{
-	auto llanalyzer_mapping = zeek::id::find_val<VectorVal>("llanalyzer_mapping");
+	auto llanalyzer_mapping = zeek::id::find("llanalyzer_mapping");
+	if ( ! llanalyzer_mapping )
+		return;
+
+	auto mapping_val = llanalyzer_mapping->GetVal()->AsVectorVal();
 
 	Config configuration;
-	for (unsigned int i = 0; i < llanalyzer_mapping->Size(); i++)
+	for (unsigned int i = 0; i < mapping_val->Size(); i++)
 		{
-		auto* rv = llanalyzer_mapping->At(i)->AsRecordVal();
+		auto* rv = mapping_val->At(i)->AsRecordVal();
+		auto parent = rv->GetField("parent");
+		std::string parent_name = parent ? Lookup(parent->AsEnumVal())->Name() : "ROOT";
+		auto identifier = rv->GetField("identifier")->AsCount();
+		auto analyzer = rv->GetField("analyzer")->AsEnumVal();
 
-		configuration.AddMapping(rv->GetField("parent")->AsStringVal()->ToStdString(),
-		                         rv->GetField("identifier")->AsCount(),
-		                         rv->GetField("analyzer")->AsStringVal()->ToStdString());
+		configuration.AddMapping(parent_name, identifier, Lookup(analyzer)->Name());
 		}
 
 	analyzer_set = new ProtocolAnalyzerSet(configuration, "DefaultAnalyzer");
@@ -52,7 +58,8 @@ void Manager::DumpDebug()
 		}
 
 	// Dump Analyzer Set
-	analyzer_set->DumpDebug();
+	if (analyzer_set)
+		analyzer_set->DumpDebug();
 #endif
 	}
 
@@ -194,6 +201,10 @@ void Manager::ProcessPacket(Packet* packet)
 	static size_t counter = 0;
 	DBG_LOG(DBG_LLPOC, "Analyzing packet %ld, ts=%.3f...", ++counter, packet->time);
 #endif
+
+	if ( ! analyzer_set )
+		return;
+
 	// Dispatch and analyze layers
 	AnalyzerResult result = AnalyzerResult::Continue;
 	identifier_t next_layer_id = packet->link_type;

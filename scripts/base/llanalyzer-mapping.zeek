@@ -1,14 +1,17 @@
 type LLAnalyzerConfigEntry : record {
     # The parent analyzer's name. This analyzer will check for the identifier in the
-    # packet data to know whether to call the next analyzer.
-    parent : string;
+    # packet data to know whether to call the next analyzer. This field is optional.
+    # If it is not included, the identifier will attach to the "root" analyzer. This
+    # means that the identifier will be searched for the initial packet header instead
+    # of later headers.
+    parent : LLAnalyzer::Tag &optional;
 
     # A numeric identifier that can be found in the packet data that denotes an
     # analyzer should be called.
     identifier : count;
 
     # The name of the analyzer that matches the above identifier.
-    analyzer : string;
+    analyzer : LLAnalyzer::Tag;
 };
 
 # These are defined in libpcap, but we need them for the default configuration below.
@@ -25,54 +28,54 @@ const AF_INET  : count = 2;
 const AF_INET6 : count = 10;
 
 global llanalyzer_mapping : vector of LLAnalyzerConfigEntry = [
-    [$parent="ROOT", $identifier=DLT_EN10MB, $analyzer="EthernetAnalyzer"],
-    [$parent="ROOT", $identifier=DLT_PPP_SERIAL, $analyzer="PPPSerialAnalyzer"],
-    [$parent="ROOT", $identifier=DLT_IEEE802_11, $analyzer="IEEE802_11Analyzer"],
-    [$parent="ROOT", $identifier=DLT_IEEE802_11_RADIO, $analyzer="IEEE802_11_RadioAnalyzer"],
-    [$parent="ROOT", $identifier=DLT_FDDI, $analyzer="FDDIAnalyzer"],
-    [$parent="ROOT", $identifier=DLT_NFLOG, $analyzer="NFLogAnalyzer"],
-    [$parent="ROOT", $identifier=DLT_NULL, $analyzer="NullAnalyzer"],
-    [$parent="ROOT", $identifier=DLT_LINUX_SLL, $analyzer="LinuxSLLAnalyzer"],
+    [$identifier=DLT_EN10MB, $analyzer=LLAnalyzer::LLANALYZER_ETHERNETANALYZER],
+    [$identifier=DLT_PPP_SERIAL, $analyzer=LLAnalyzer::LLANALYZER_PPPSERIALANALYZER],
+    [$identifier=DLT_IEEE802_11, $analyzer=LLAnalyzer::LLANALYZER_IEEE802_11ANALYZER],
+    [$identifier=DLT_IEEE802_11_RADIO, $analyzer=LLAnalyzer::LLANALYZER_IEEE802_11_RADIOANALYZER],
+    [$identifier=DLT_FDDI, $analyzer=LLAnalyzer::LLANALYZER_FDDIANALYZER],
+    [$identifier=DLT_NFLOG, $analyzer=LLAnalyzer::LLANALYZER_NFLOGANALYZER],
+    [$identifier=DLT_NULL, $analyzer=LLAnalyzer::LLANALYZER_NULLANALYZER],
+    [$identifier=DLT_LINUX_SLL, $analyzer=LLAnalyzer::LLANALYZER_LINUXSLLANALYZER],
 
-    [$parent="DefaultAnalyzer", $identifier=4, $analyzer="IPv4Analyzer"],
-    [$parent="DefaultAnalyzer", $identifier=6, $analyzer="IPv6Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_DEFAULTANALYZER, $identifier=4, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_DEFAULTANALYZER, $identifier=6, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
 
-    [$parent="EthernetAnalyzer", $identifier=0x8847, $analyzer="MPLSAnalyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x0800, $analyzer="IPv4Analyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x8100, $analyzer="VLANAnalyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x88A8, $analyzer="VLANAnalyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x9100, $analyzer="VLANAnalyzer"],
-    [$parent="EthernetAnalyzer", $identifier=0x8864, $analyzer="PPPoEAnalyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x8847, $analyzer=LLAnalyzer::LLANALYZER_MPLSANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x0800, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x86DD, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x0806, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x8035, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x8100, $analyzer=LLAnalyzer::LLANALYZER_VLANANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x88A8, $analyzer=LLAnalyzer::LLANALYZER_VLANANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x9100, $analyzer=LLAnalyzer::LLANALYZER_VLANANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_ETHERNETANALYZER, $identifier=0x8864, $analyzer=LLAnalyzer::LLANALYZER_PPPOEANALYZER],
 
-     [$parent="VLANAnalyzer", $identifier=0x8847, $analyzer="MPLSAnalyzer"],
-     [$parent="VLANAnalyzer", $identifier=0x0800, $analyzer="IPv4Analyzer"],
-     [$parent="VLANAnalyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
-     [$parent="VLANAnalyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
-     [$parent="VLANAnalyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"],
-     [$parent="VLANAnalyzer", $identifier=0x8100, $analyzer="VLANAnalyzer"],
-     [$parent="VLANAnalyzer", $identifier=0x8864, $analyzer="PPPoEAnalyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x8847, $analyzer=LLAnalyzer::LLANALYZER_MPLSANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x0800, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x86DD, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x0806, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x8035, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x8100, $analyzer=LLAnalyzer::LLANALYZER_VLANANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_VLANANALYZER, $identifier=0x8864, $analyzer=LLAnalyzer::LLANALYZER_PPPOEANALYZER],
 
-    [$parent="PPPoEAnalyzer", $identifier=0x0021, $analyzer="IPv4Analyzer"],
-    [$parent="PPPoEAnalyzer", $identifier=0x0057, $analyzer="IPv6Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_PPPOEANALYZER, $identifier=0x0021, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_PPPOEANALYZER, $identifier=0x0057, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
 
-    [$parent="IEEE802_11_RadioAnalyzer", $identifier=DLT_IEEE802_11, $analyzer="IEEE802_11Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_IEEE802_11_RADIOANALYZER, $identifier=DLT_IEEE802_11, $analyzer=LLAnalyzer::LLANALYZER_IEEE802_11ANALYZER],
 
-    [$parent="PPPSerialAnalyzer", $identifier=0x0281, $analyzer="MPLSAnalyzer"],
-    [$parent="PPPSerialAnalyzer", $identifier=0x0021, $analyzer="IPv4Analyzer"],
-    [$parent="PPPSerialAnalyzer", $identifier=0x0057, $analyzer="IPv6Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_PPPSERIALANALYZER, $identifier=0x0281, $analyzer=LLAnalyzer::LLANALYZER_MPLSANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_PPPSERIALANALYZER, $identifier=0x0021, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_PPPSERIALANALYZER, $identifier=0x0057, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
 
-    [$parent="IEEE802_11Analyzer", $identifier=0x0800, $analyzer="IPv4Analyzer"],
-    [$parent="IEEE802_11Analyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
-    [$parent="IEEE802_11Analyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
-    [$parent="IEEE802_11Analyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_IEEE802_11ANALYZER, $identifier=0x0800, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_IEEE802_11ANALYZER, $identifier=0x86DD, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_IEEE802_11ANALYZER, $identifier=0x0806, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_IEEE802_11ANALYZER, $identifier=0x8035, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
 
-    [$parent="NFLogAnalyzer", $identifier=AF_INET, $analyzer="IPv4Analyzer"],
-    [$parent="NFLogAnalyzer", $identifier=AF_INET6, $analyzer="IPv6Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_NFLOGANALYZER, $identifier=AF_INET, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_NFLOGANALYZER, $identifier=AF_INET6, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
 
-    [$parent="NullAnalyzer", $identifier=AF_INET, $analyzer="IPv4Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_NULLANALYZER, $identifier=AF_INET, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
 
     ## From the Wireshark Wiki: "AF_INET6, unfortunately, has
     ## different values in {NetBSD,OpenBSD,BSD/OS},
@@ -81,14 +84,14 @@ global llanalyzer_mapping : vector of LLAnalyzerConfigEntry = [
     ## as the AF_ value." As we may be reading traces captured on
     ## platforms other than what we're running on, we accept them
     ## all here.
-    [$parent="NullAnalyzer", $identifier=24, $analyzer="IPv6Analyzer"],
-    [$parent="NullAnalyzer", $identifier=28, $analyzer="IPv6Analyzer"],
-    [$parent="NullAnalyzer", $identifier=30, $analyzer="IPv6Analyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_NULLANALYZER, $identifier=24, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_NULLANALYZER, $identifier=28, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_NULLANALYZER, $identifier=30, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
 
-    [$parent="LinuxSLLAnalyzer", $identifier=0x0800, $analyzer="IPv4Analyzer"],
-    [$parent="LinuxSLLAnalyzer", $identifier=0x86DD, $analyzer="IPv6Analyzer"],
-    [$parent="LinuxSLLAnalyzer", $identifier=0x0806, $analyzer="ARPAnalyzer"],
+    [$parent=LLAnalyzer::LLANALYZER_LINUXSLLANALYZER, $identifier=0x0800, $analyzer=LLAnalyzer::LLANALYZER_IPV4ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_LINUXSLLANALYZER, $identifier=0x86DD, $analyzer=LLAnalyzer::LLANALYZER_IPV6ANALYZER],
+    [$parent=LLAnalyzer::LLANALYZER_LINUXSLLANALYZER, $identifier=0x0806, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER],
 
     # RARP
-    [$parent="LinuxSLLAnalyzer", $identifier=0x8035, $analyzer="ARPAnalyzer"]
+    [$parent=LLAnalyzer::LLANALYZER_LINUXSLLANALYZER, $identifier=0x8035, $analyzer=LLAnalyzer::LLANALYZER_ARPANALYZER]
 ];
