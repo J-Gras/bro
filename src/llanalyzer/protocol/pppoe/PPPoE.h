@@ -7,14 +7,14 @@ namespace zeek::llanalyzer::PPPoE {
 
 class PPPoEAnalyzer : public Analyzer {
 public:
-    PPPoEAnalyzer();
-    ~PPPoEAnalyzer() override = default;
+	PPPoEAnalyzer();
+	~PPPoEAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate()
-        {
-        return new PPPoEAnalyzer();
+	static Analyzer* Instantiate()
+		{
+		return new PPPoEAnalyzer();
         }
 };
 

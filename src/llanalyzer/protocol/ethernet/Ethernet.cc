@@ -32,7 +32,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 
 	// Skip everything but Ethernet II packets
 	if ( protocol < 1536 )
-	    return std::make_tuple(AnalyzerResult::Terminate, protocol);
+		return std::make_tuple(AnalyzerResult::Terminate, protocol);
 
 	packet->eth_type = protocol;
 	packet->l2_dst = pdata;

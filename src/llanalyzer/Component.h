@@ -14,7 +14,7 @@ namespace zeek::llanalyzer {
 class Analyzer;
 
 class Component : public plugin::Component,
-				  public plugin::TaggedComponent<llanalyzer::Tag> {
+                  public plugin::TaggedComponent<llanalyzer::Tag> {
 public:
 	typedef Analyzer* (*factory_callback)();
 

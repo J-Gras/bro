@@ -7,15 +7,15 @@ namespace zeek::llanalyzer::VLAN {
 
 class VLANAnalyzer : public Analyzer {
 public:
-    VLANAnalyzer();
-    ~VLANAnalyzer() override = default;
+	VLANAnalyzer();
+	~VLANAnalyzer() override = default;
 
-    std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
+	std::tuple<AnalyzerResult, identifier_t> Analyze(Packet* packet) override;
 
-    static Analyzer* Instantiate()
-        {
-        return new VLANAnalyzer();
-        }
+	static Analyzer* Instantiate()
+		{
+		return new VLANAnalyzer();
+		}
 };
 
 }

@@ -193,7 +193,7 @@ void PcapSource::OpenOffline()
 
 bool PcapSource::ExtractNextPacket(Packet* pkt)
 	{
-    if ( ! pd )
+	if ( ! pd )
 		return false;
 
 	const u_char* data;
