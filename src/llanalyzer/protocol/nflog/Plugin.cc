@@ -4,14 +4,14 @@
 
 namespace zeek::plugin::LLPOC_NFLog {
 
-class Plugin : public ::plugin::Plugin {
+class Plugin : public zeek::plugin::Plugin {
 public:
-	::plugin::Configuration Configure()
+	zeek::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("NFLogAnalyzer",
 		                 zeek::llanalyzer::NFLog::NFLogAnalyzer::Instantiate));
 
-		::plugin::Configuration config;
+		zeek::plugin::Configuration config;
 		config.name = "LLPOC::NFLogAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;

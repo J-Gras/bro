@@ -4,14 +4,14 @@
 
 namespace zeek::plugin::LLPOC_PPPSerial {
 
-class Plugin : public ::plugin::Plugin {
+class Plugin : public zeek::plugin::Plugin {
 public:
-	::plugin::Configuration Configure()
+	zeek::plugin::Configuration Configure()
 		{
 		AddComponent(new zeek::llanalyzer::Component("PPPSerialAnalyzer",
 		                 zeek::llanalyzer::PPPSerial::PPPSerialAnalyzer::Instantiate));
 
-		::plugin::Configuration config;
+		zeek::plugin::Configuration config;
 		config.name = "LLPOC::PPPSerialAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
