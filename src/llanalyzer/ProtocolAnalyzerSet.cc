@@ -87,10 +87,10 @@ void ProtocolAnalyzerSet::Reset()
 void ProtocolAnalyzerSet::DumpDebug() const
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_LLPOC, "ProtocolAnalyzerSet FSM:");
+	DBG_LOG(DBG_LLANALYZER, "ProtocolAnalyzerSet FSM:");
 	for ( const auto& current : dispatchers )
 		{
-		DBG_LOG(DBG_LLPOC, "  Dispatcher (%p): %s", current.second, current.first.c_str());
+		DBG_LOG(DBG_LLANALYZER, "  Dispatcher (%p): %s", current.second, current.first.c_str());
 		current.second->DumpDebug();
 		}
 #endif

@@ -20,7 +20,7 @@ const std::map<identifier_t, std::string>& DispatcherConfig::GetMappings() const
 void DispatcherConfig::AddMapping(identifier_t identifier,
 								  const std::string& analyzer_name)
 	{
-	DBG_LOG(DBG_LLPOC, "Adding configuration mapping: %s -> %d -> %s",
+	DBG_LOG(DBG_LLANALYZER, "Adding configuration mapping: %s -> %d -> %s",
 	        name.c_str(), identifier, analyzer_name.c_str());
 
 	if ( mappings.count(identifier) )

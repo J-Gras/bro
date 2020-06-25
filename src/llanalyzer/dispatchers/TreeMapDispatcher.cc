@@ -43,10 +43,10 @@ void TreeMapDispatcher::FreeValues()
 void TreeMapDispatcher::DumpDebug() const
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_LLPOC, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
+	DBG_LOG(DBG_LLANALYZER, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
 	for ( const auto& current : table )
 		{
-		DBG_LOG(DBG_LLPOC, "    %#8x => %s, %p", current.first, current.second->analyzer->GetAnalyzerName(), current.second->dispatcher);
+		DBG_LOG(DBG_LLANALYZER, "    %#8x => %s, %p", current.first, current.second->analyzer->GetAnalyzerName(), current.second->dispatcher);
 		}
 #endif
 	}

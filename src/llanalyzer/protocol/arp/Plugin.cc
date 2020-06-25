@@ -2,7 +2,7 @@
 #include "ARP.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_ARP {
+namespace zeek::plugin::LLAnalyzer_ARP {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		                 zeek::llanalyzer::ARP::ARPAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::ARPAnalyzer";
+		config.name = "LLAnalyzer::ARPAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

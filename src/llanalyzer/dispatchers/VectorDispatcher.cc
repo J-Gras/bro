@@ -107,12 +107,12 @@ void VectorDispatcher::FreeValues()
 void VectorDispatcher::DumpDebug() const
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_LLPOC, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
-	DBG_LOG(DBG_LLPOC, "TABLE SIZE %lu", table.size());
+	DBG_LOG(DBG_LLANALYZER, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
+	DBG_LOG(DBG_LLANALYZER, "TABLE SIZE %lu", table.size());
 	for ( size_t i = 0; i < table.size(); i++ )
 		{
 		if ( table[i] != nullptr )
-			DBG_LOG(DBG_LLPOC, "    %#8lx => %s, %p", i, table[i]->analyzer->GetAnalyzerName(), table[i]->dispatcher);
+			DBG_LOG(DBG_LLANALYZER, "    %#8lx => %s, %p", i, table[i]->analyzer->GetAnalyzerName(), table[i]->dispatcher);
 		}
 #endif
 	}

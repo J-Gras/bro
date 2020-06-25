@@ -2,7 +2,7 @@
 #include "IPv6.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_IPv6 {
+namespace zeek::plugin::LLAnalyzer_IPv6 {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		             zeek::llanalyzer::IPv6::IPv6Analyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::IPv6Analyzer";
+		config.name = "LLAnalyzer::IPv6Analyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

@@ -2,7 +2,7 @@
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_FDDI {
+namespace zeek::plugin::LLAnalyzer_FDDI {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		                 zeek::llanalyzer::FDDI::FDDIAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::FDDIAnalyzer";
+		config.name = "LLAnalyzer::FDDIAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

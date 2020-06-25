@@ -2,7 +2,7 @@
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_IEEE802_11_Radio {
+namespace zeek::plugin::LLAnalyzer_IEEE802_11_Radio {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		                 zeek::llanalyzer::IEEE802_11_Radio::IEEE802_11_RadioAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::IEEE802_11_RadioAnalyzer";
+		config.name = "LLAnalyzer::IEEE802_11_RadioAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

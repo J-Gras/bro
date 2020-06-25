@@ -2,7 +2,7 @@
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_MPLS {
+namespace zeek::plugin::LLAnalyzer_MPLS {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		                 zeek::llanalyzer::MPLS::MPLSAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::MPLSAnalyzer";
+		config.name = "LLAnalyzer::MPLSAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

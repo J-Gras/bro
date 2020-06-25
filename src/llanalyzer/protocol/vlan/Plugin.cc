@@ -2,7 +2,7 @@
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_VLAN {
+namespace zeek::plugin::LLAnalyzer_VLAN {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
                          zeek::llanalyzer::VLAN::VLANAnalyzer::Instantiate));
 
         zeek::plugin::Configuration config;
-        config.name = "LLPOC::VLANAnalyzer";
+        config.name = "LLAnalyzer::VLANAnalyzer";
         config.description = "A wrapper for the original zeek code.";
         return config;
         }

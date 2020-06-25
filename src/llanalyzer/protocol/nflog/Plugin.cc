@@ -2,7 +2,7 @@
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_NFLog {
+namespace zeek::plugin::LLAnalyzer_NFLog {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		                 zeek::llanalyzer::NFLog::NFLogAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::NFLogAnalyzer";
+		config.name = "LLAnalyzer::NFLogAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

@@ -2,7 +2,7 @@
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_PPPoE {
+namespace zeek::plugin::LLAnalyzer_PPPoE {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
                          zeek::llanalyzer::PPPoE::PPPoEAnalyzer::Instantiate));
 
         zeek::plugin::Configuration config;
-        config.name = "LLPOC::PPPoEAnalyzer";
+        config.name = "LLAnalyzer::PPPoEAnalyzer";
         config.description = "A wrapper for the original zeek code.";
         return config;
         }

@@ -119,11 +119,11 @@ void UniversalDispatcher::Rehash()
 void UniversalDispatcher::DumpDebug() const
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_LLPOC, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
+	DBG_LOG(DBG_LLANALYZER, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
 	for ( size_t i = 0; i < table.size(); i++ )
 		{
 		if ( table[i].second != nullptr )
-			DBG_LOG(DBG_LLPOC, "    %#8x => %s, %p", table[i].first, table[i].second->analyzer->GetAnalyzerName(), table[i].second->dispatcher);
+			DBG_LOG(DBG_LLANALYZER, "    %#8x => %s, %p", table[i].first, table[i].second->analyzer->GetAnalyzerName(), table[i].second->dispatcher);
 		}
 #endif
 	}
@@ -145,7 +145,7 @@ void UniversalDispatcher::Rehash(const std::vector<pair_t>& intermediate)
 	{
 	while ( ! FindCollisionFreeHashFunction(intermediate) )
 		{
-		DBG_LOG(DBG_LLPOC, "Rehashing did not work. Increasing #bins to %" PRIu64 " (%" PRIu64 " bit).", (uint64_t)std::pow(2, m + 1), m + 1);
+		DBG_LOG(DBG_LLANALYZER, "Rehashing did not work. Increasing #bins to %" PRIu64 " (%" PRIu64 " bit).", (uint64_t)std::pow(2, m + 1), m + 1);
 		SetBins(m + 1);
 		}
 	}
@@ -193,7 +193,7 @@ bool UniversalDispatcher::FindCollisionFreeHashFunction(const std::vector<pair_t
 		// Step 4: If the inserting finished without collisions, overwrite the previous table and exit
 		if ( finished )
 			{
-			DBG_LOG(DBG_LLPOC, "Took %lu rehash(es) to resolve.", i);
+			DBG_LOG(DBG_LLANALYZER, "Took %lu rehash(es) to resolve.", i);
 			table = new_table;
 			return true;
 			}

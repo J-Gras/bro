@@ -2,7 +2,7 @@
 #include "LinuxSLL.h"
 #include "llanalyzer/Component.h"
 
-namespace zeek::plugin::LLPOC_LinuxSLL {
+namespace zeek::plugin::LLAnalyzer_LinuxSLL {
 
 class Plugin : public zeek::plugin::Plugin {
 public:
@@ -12,7 +12,7 @@ public:
 		                 zeek::llanalyzer::LinuxSLL::LinuxSLLAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLPOC::LinuxSLLAnalyzer";
+		config.name = "LLAnalyzer::LinuxSLLAnalyzer";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

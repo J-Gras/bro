@@ -53,10 +53,10 @@ void Manager::Done()
 void Manager::DumpDebug()
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_LLPOC, "Available llanalyzers after zeek_init():");
+	DBG_LOG(DBG_LLANALYZER, "Available llanalyzers after zeek_init():");
 	for ( auto& current : GetComponents() )
 		{
-		DBG_LOG(DBG_LLPOC, "    %s (%s)", current->Name().c_str(), IsEnabled(current->Tag()) ? "enabled" : "disabled");
+		DBG_LOG(DBG_LLANALYZER, "    %s (%s)", current->Name().c_str(), IsEnabled(current->Tag()) ? "enabled" : "disabled");
 		}
 
 	// Dump Analyzer Set
@@ -72,7 +72,7 @@ bool Manager::EnableAnalyzer(const Tag& tag)
 	if ( ! p )
 		return false;
 
-	DBG_LOG(DBG_LLPOC, "Enabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_LLANALYZER, "Enabling analyzer %s", p->Name().c_str());
 	p->SetEnabled(true);
 
 	return true;
@@ -85,7 +85,7 @@ bool Manager::EnableAnalyzer(EnumVal* val)
 	if ( ! p )
 		return false;
 
-	DBG_LOG(DBG_LLPOC, "Enabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_LLANALYZER, "Enabling analyzer %s", p->Name().c_str());
 	p->SetEnabled(true);
 
 	return true;
@@ -98,7 +98,7 @@ bool Manager::DisableAnalyzer(const Tag& tag)
 	if ( ! p )
 		return false;
 
-	DBG_LOG(DBG_LLPOC, "Disabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_LLANALYZER, "Disabling analyzer %s", p->Name().c_str());
 	p->SetEnabled(false);
 
 	return true;
@@ -111,7 +111,7 @@ bool Manager::DisableAnalyzer(EnumVal* val)
 	if ( ! p )
 		return false;
 
-	DBG_LOG(DBG_LLPOC, "Disabling analyzer %s", p->Name().c_str());
+	DBG_LOG(DBG_LLANALYZER, "Disabling analyzer %s", p->Name().c_str());
 	p->SetEnabled(false);
 
 	return true;
@@ -119,7 +119,7 @@ bool Manager::DisableAnalyzer(EnumVal* val)
 
 void Manager::DisableAllAnalyzers()
 	{
-	DBG_LOG(DBG_LLPOC, "Disabling all analyzers");
+	DBG_LOG(DBG_LLANALYZER, "Disabling all analyzers");
 
 	std::list<Component*> all_analyzers = GetComponents();
 	for ( const auto& analyzer : all_analyzers )
@@ -201,7 +201,7 @@ void Manager::ProcessPacket(Packet* packet)
 	{
 #ifdef DEBUG
 	static size_t counter = 0;
-	DBG_LOG(DBG_LLPOC, "Analyzing packet %ld, ts=%.3f...", ++counter, packet->time);
+	DBG_LOG(DBG_LLANALYZER, "Analyzing packet %ld, ts=%.3f...", ++counter, packet->time);
 #endif
 
 	if ( ! analyzer_set )
@@ -217,7 +217,7 @@ void Manager::ProcessPacket(Packet* packet)
 		// Analyzer not found
 		if ( current_analyzer == nullptr )
 			{
-			DBG_LOG(DBG_LLPOC, "Could not find analyzer for identifier %#x", next_layer_id);
+			DBG_LOG(DBG_LLANALYZER, "Could not find analyzer for identifier %#x", next_layer_id);
 			packet->Weird("no_suitable_analyzer_found");
 			break;
 			}
@@ -229,14 +229,14 @@ void Manager::ProcessPacket(Packet* packet)
 		switch ( result )
 			{
 			case AnalyzerResult::Continue:
-				DBG_LOG(DBG_LLPOC, "Analysis in %s succeded, next layer identifier is %#x.",
+				DBG_LOG(DBG_LLANALYZER, "Analysis in %s succeded, next layer identifier is %#x.",
 				        current_analyzer->GetAnalyzerName(), next_layer_id);
 				break;
 			case AnalyzerResult::Terminate:
-				DBG_LOG(DBG_LLPOC, "Done, last found layer identifier was %#x.", next_layer_id);
+				DBG_LOG(DBG_LLANALYZER, "Done, last found layer identifier was %#x.", next_layer_id);
 				break;
 			default:
-				DBG_LOG(DBG_LLPOC, "Analysis failed in %s", current_analyzer->GetAnalyzerName());
+				DBG_LOG(DBG_LLANALYZER, "Analysis failed in %s", current_analyzer->GetAnalyzerName());
 			}
 #endif
 
