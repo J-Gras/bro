@@ -42,8 +42,9 @@ void UnorderedMapDispatcher::Register(const register_map& data)
 
 const Value* UnorderedMapDispatcher::Lookup(identifier_t identifier) const
 	{
-	if ( table.count(identifier) != 0 )
-		return table.at(identifier);
+	auto it = table.find(identifier);
+	if ( it != table.end() )
+		return it->second;
 
 	return nullptr;
 	}

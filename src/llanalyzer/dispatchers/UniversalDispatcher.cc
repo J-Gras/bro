@@ -53,22 +53,22 @@ bool UniversalDispatcher::Register(identifier_t identifier, Analyzer* analyzer, 
 	return false;
 	}
 
-	void UniversalDispatcher::Register(const register_map& data)
+void UniversalDispatcher::Register(const register_map& data)
+	{
+	// Analyzer already registered
+	for ( const auto& current : data )
 		{
-		// Analyzer already registered
-		for ( const auto& current : data )
-			{
-			if ( table[Hash(current.first)].second != nullptr )
-				throw std::invalid_argument("Analyzer " + std::to_string(current.first) + " already registered!");
-			}
-
-		// Create intermediate representation of current analyzer set, then add all new ones
-		std::vector<pair_t> intermediate = CreateIntermediate();
-		for ( const auto& current : data )
-			intermediate.emplace_back(current.first, new Value(current.second.first, current.second.second));
-
-		Rehash(intermediate);
+		if ( table[Hash(current.first)].second != nullptr )
+			throw std::invalid_argument("Analyzer " + std::to_string(current.first) + " already registered!");
 		}
+
+	// Create intermediate representation of current analyzer set, then add all new ones
+	std::vector<pair_t> intermediate = CreateIntermediate();
+	for ( const auto& current : data )
+		intermediate.emplace_back(current.first, new Value(current.second.first, current.second.second));
+
+	Rehash(intermediate);
+	}
 
 Value* UniversalDispatcher::Lookup(identifier_t identifier) const
 	{

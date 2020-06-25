@@ -4,7 +4,7 @@ namespace zeek::llanalyzer {
 
 TreeMapDispatcher::~TreeMapDispatcher()
 	{
-	FreeValues();
+	Clear();
 	}
 
 bool TreeMapDispatcher::Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher)
@@ -16,8 +16,8 @@ Value* TreeMapDispatcher::Lookup(identifier_t identifier) const
 	{
 	if ( table.count(identifier) != 0 )
 		return table.at(identifier);
-	else
-		return nullptr;
+
+	return nullptr;
 	}
 
 size_t TreeMapDispatcher::Size() const
@@ -27,17 +27,10 @@ size_t TreeMapDispatcher::Size() const
 
 void TreeMapDispatcher::Clear()
 	{
-	FreeValues();
-	table.clear();
-	}
-
-void TreeMapDispatcher::FreeValues()
-	{
 	for ( auto& current : table )
-		{
 		delete current.second;
-		current.second = nullptr;
-		}
+
+	table.clear();
 	}
 
 void TreeMapDispatcher::DumpDebug() const
