@@ -18,18 +18,18 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	if ( pdata + len_80211 >= end_of_data )
 		{
 		packet->Weird("truncated_802_11_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	u_char fc_80211 = pdata[0]; // Frame Control field
 
 	// Skip non-data frame types (management & control).
 	if ( ! ((fc_80211 >> 2) & 0x02) )
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 
 	// Skip subtypes without data.
 	if ( (fc_80211 >> 4) & 0x04 )
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 
 	// 'To DS' and 'From DS' flags set indicate use of the 4th
 	// address field.
@@ -42,7 +42,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 		// Skip in case of A-MSDU subframes indicated by QoS
 		// control field.
 		if ( pdata[len_80211] & 0x80 )
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 
 		len_80211 += 2;
 		}
@@ -50,7 +50,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	if ( pdata + len_80211 >= end_of_data )
 		{
 		packet->Weird("truncated_802_11_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	// Determine link-layer addresses based
@@ -84,7 +84,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	if ( pdata + 8 >= end_of_data )
 		{
 		packet->Weird("truncated_802_11_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	// Check that the DSAP and SSAP are both SNAP and that the control
@@ -101,11 +101,11 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 		// If this is a logical link control frame without the
 		// possibility of having a protocol we care about, we'll
 		// just skip it for now.
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	identifier_t protocol = (pdata[0] << 8) + pdata[1];
 	pdata += 2;
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

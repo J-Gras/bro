@@ -20,7 +20,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> MPL
 		if ( pdata + 4 >= end_of_data )
 			{
 			packet->Weird("truncated_link_header");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 
 		end_of_stack = *(pdata + 2u) & 0x01;
@@ -32,7 +32,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> MPL
 	if ( pdata + sizeof(struct ip) >= end_of_data )
 		{
 		packet->Weird("no_ip_in_mpls_payload");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	auto ip = (const struct ip*)pdata;
@@ -45,9 +45,9 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> MPL
 		{
 		// Neither IPv4 nor IPv6.
 		packet->Weird("no_ip_in_mpls_payload");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	packet->hdr_size = (pdata - packet->data);
-	return std::make_tuple(AnalyzerResult::Terminate, 0);
+	return { AnalyzerResult::Terminate, 0 };
 	}

@@ -16,5 +16,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> PPP
 	identifier_t protocol = (pdata[2] << 8) + pdata[3];
 	pdata += 4; // skip link header
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

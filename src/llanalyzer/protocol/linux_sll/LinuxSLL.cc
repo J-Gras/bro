@@ -16,7 +16,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Lin
 	if ( pdata + 16 >= packet->GetEndOfData() )
 		{
 		packet->Weird("truncated_Linux_SLL_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	auto hdr = (const SLLHeader*)pdata;
@@ -24,5 +24,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Lin
 	identifier_t protocol = ntohs(hdr->protocol_type);
 
 	pdata += 16;
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

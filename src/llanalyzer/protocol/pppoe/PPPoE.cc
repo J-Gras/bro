@@ -15,12 +15,12 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> PPP
 	if ( pdata + 8 >= packet->GetEndOfData() )
 		{
 		packet->Weird("truncated_pppoe_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	// Extract protocol identifier
 	identifier_t protocol = (pdata[6] << 8u) + pdata[7];
 	pdata += 8; // Skip the PPPoE session and PPP header
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

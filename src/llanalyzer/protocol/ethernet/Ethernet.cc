@@ -21,7 +21,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 		if ( pdata + cfplen + 14 >= end_of_data )
 			{
 			packet->Weird("truncated_link_header_cfp");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 
 		pdata += cfplen;
@@ -32,7 +32,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 
 	// Skip everything but Ethernet II packets
 	if ( protocol < 1536 )
-		return std::make_tuple(AnalyzerResult::Terminate, protocol);
+		return { AnalyzerResult::Terminate, protocol };
 
 	packet->eth_type = protocol;
 	packet->l2_dst = pdata;
@@ -40,5 +40,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Eth
 
 	pdata += 14;
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

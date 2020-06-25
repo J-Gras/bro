@@ -18,7 +18,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	if ( pdata + 3 >= end_of_data )
 		{
 		packet->Weird("truncated_radiotap_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	// Skip over the RadioTap header
@@ -27,10 +27,10 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	if ( pdata + rtheader_len >= end_of_data )
 		{
 		packet->Weird("truncated_radiotap_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	packet->cur_pos += rtheader_len;
 
-	return std::make_tuple(AnalyzerResult::Continue, DLT_IEEE802_11);
+	return { AnalyzerResult::Continue, DLT_IEEE802_11 };
 	}

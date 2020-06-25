@@ -16,11 +16,11 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Def
 	if ( pdata + sizeof(struct ip) >= packet->GetEndOfData() )
 		{
 		packet->Weird("default_ll_analyser_failed");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	auto ip = (const struct ip *)pdata;
 	identifier_t protocol = ip->ip_v;
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}
