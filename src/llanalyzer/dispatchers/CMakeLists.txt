@@ -6,6 +6,7 @@ include_directories(BEFORE
 )
 
 set(dispatcher_SRCS
+  DictDispatcher.cc
   TreeMapDispatcher.cc
   UniversalDispatcher.cc
   UnorderedMapDispatcher.cc
