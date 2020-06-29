@@ -6,8 +6,8 @@ include_directories(BEFORE
 )
 
 add_subdirectory(protocol)
+add_subdirectory(dispatchers)
 
-file(GLOB_RECURSE disp_SRCS dispatchers/*.cc)
 set(llanalyzer_SRCS
     Analyzer.cc
     ProtocolAnalyzerSet.cc
@@ -16,7 +16,6 @@ set(llanalyzer_SRCS
     Tag.cc
     Config.cc
     Timing.cc
-    ${disp_SRCS}
 )
 
 bro_add_subdir_library(llanalyzer ${llanalyzer_SRCS})

@@ -7,6 +7,7 @@
 #include "dispatchers/UniversalDispatcher.h"
 #include "dispatchers/UnorderedMapDispatcher.h"
 #include "dispatchers/VectorDispatcher.h"
+#include "dispatchers/DictDispatcher.h"
 
 namespace zeek::llanalyzer {
 
@@ -23,8 +24,10 @@ protected:
 	void DumpDebug() const override;
 
 private:
-	//    using dispatcher_impl = UnorderedMapDispatcher;
-	//    using dispatcher_impl = VectorDispatcher;
+	//using dispatcher_impl = UnorderedMapDispatcher;
+	//using dispatcher_impl = VectorDispatcher;
+	//using dispatcher_impl = TreeMapDispatcher;
+	//using dispatcher_impl = DictDispatcher;
 	using dispatcher_impl = UniversalDispatcher;
 
 	std::map<std::string, Analyzer*> analyzers;

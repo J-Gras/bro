@@ -16,10 +16,10 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> FDD
 	if ( pdata + hdr_size >= packet->GetEndOfData() )
 		{
 		packet->Weird("FDDI_analyzer_failed");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	// We just skip the header and hope for default analysis
 	pdata += hdr_size;
-	return std::make_tuple(AnalyzerResult::Continue, -1);
+	return { AnalyzerResult::Continue, -1 };
 	}

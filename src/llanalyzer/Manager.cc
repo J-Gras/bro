@@ -229,7 +229,7 @@ void Manager::ProcessPacket(Packet* packet)
 		switch ( result )
 			{
 			case AnalyzerResult::Continue:
-				DBG_LOG(DBG_LLANALYZER, "Analysis in %s succeded, next layer identifier is %#x.",
+				DBG_LOG(DBG_LLANALYZER, "Analysis in %s succeeded, next layer identifier is %#x.",
 				        current_analyzer->GetAnalyzerName(), next_layer_id);
 				break;
 			case AnalyzerResult::Terminate:
@@ -251,7 +251,7 @@ void Manager::ProcessPacket(Packet* packet)
 
 void Manager::CustomEncapsulationSkip(Packet* packet)
 	{
-	if ( encap_hdr_size )
+	if ( encap_hdr_size > 0 )
 		{
 		auto pdata = packet->cur_pos;
 

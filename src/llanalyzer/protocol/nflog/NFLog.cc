@@ -19,7 +19,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> NFL
 	if ( version != 0 )
 		{
 		packet->Weird("unknown_nflog_version");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	// Skip to TLVs.
@@ -33,7 +33,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> NFL
 		if ( pdata + 4 >= end_of_data )
 			{
 			packet->Weird("nflog_no_pcap_payload");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 
 		// TLV Type and Length values are specified in host byte order
@@ -60,7 +60,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> NFL
 			if ( tlv_len < 4 )
 				{
 				packet->Weird("nflog_bad_tlv_len");
-				return std::make_tuple(AnalyzerResult::Failed, 0);
+				return { AnalyzerResult::Failed, 0 };
 				}
 			else
 				{
@@ -74,5 +74,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> NFL
 			}
 		}
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

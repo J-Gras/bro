@@ -13,5 +13,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IPv
 	packet->hdr_size = (packet->cur_pos - packet->data);
 
 	// Leave LL analyzer land
-	return std::make_tuple(AnalyzerResult::Terminate, 0);
+	return { AnalyzerResult::Terminate, 0 };
 	}

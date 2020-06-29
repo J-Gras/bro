@@ -15,7 +15,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> VLA
 	if ( pdata + 4 >= packet->GetEndOfData() )
 		{
 		packet->Weird("truncated_VLAN_header");
-		return std::make_tuple(AnalyzerResult::Failed, 0);
+		return { AnalyzerResult::Failed, 0 };
 		}
 
 	auto& vlan_ref = packet->vlan != 0 ? packet->inner_vlan : packet->vlan;
@@ -25,5 +25,5 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> VLA
 	packet->eth_type = protocol;
 	pdata += 4; // Skip the VLAN header
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

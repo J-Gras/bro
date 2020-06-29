@@ -26,7 +26,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 		if ( pdata + cfplen + 14 >= end_of_data )
 			{
 			packet->Weird("truncated_link_header_cfp");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 
 		pdata += cfplen;
@@ -56,7 +56,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 				if ( pdata + 4 >= end_of_data )
 					{
 					packet->Weird("truncated_link_header");
-					return std::make_tuple(AnalyzerResult::Failed, 0);
+					return { AnalyzerResult::Failed, 0 };
 					}
 
 				auto& vlan_ref = saw_vlan ? packet->inner_vlan : packet->vlan;
@@ -74,7 +74,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 				if ( pdata + 8 >= end_of_data )
 					{
 					packet->Weird("truncated_link_header");
-					return std::make_tuple(AnalyzerResult::Failed, 0);
+					return { AnalyzerResult::Failed, 0 };
 					}
 
 				protocol = (pdata[6] << 8u) + pdata[7];
@@ -88,7 +88,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 					{
 					// Neither IPv4 nor IPv6.
 					packet->Weird("non_ip_packet_in_pppoe_encapsulation");
-					return std::make_tuple(AnalyzerResult::Failed, 0);
+					return { AnalyzerResult::Failed, 0 };
 					}
 				}
 			break;
@@ -112,7 +112,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 			{
 			// Neither IPv4 nor IPv6.
 			packet->Weird("non_ip_packet_in_ethernet");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 		}
 
@@ -126,7 +126,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 			if ( pdata + 4 >= end_of_data )
 				{
 				packet->Weird("truncated_link_header");
-				return std::make_tuple(AnalyzerResult::Failed, 0);
+				return { AnalyzerResult::Failed, 0 };
 				}
 
 			end_of_stack = *(pdata + 2u) & 0x01;
@@ -137,7 +137,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 		if ( pdata + sizeof(struct ip) >= end_of_data )
 			{
 			packet->Weird("no_ip_in_mpls_payload");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 
 		const struct ip* ip = (const struct ip*)pdata;
@@ -150,12 +150,12 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Wra
 			{
 			// Neither IPv4 nor IPv6.
 			packet->Weird("no_ip_in_mpls_payload");
-			return std::make_tuple(AnalyzerResult::Failed, 0);
+			return { AnalyzerResult::Failed, 0 };
 			}
 		}
 
 	// Calculate how much header we've used up.
 	packet->hdr_size = (pdata - packet->data);
 
-	return std::make_tuple(AnalyzerResult::Continue, protocol);
+	return { AnalyzerResult::Continue, protocol };
 	}

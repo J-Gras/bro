@@ -1,13 +1,13 @@
 #pragma once
 
-#include <map>
+#include "Dict.h"
 #include "Dispatcher.h"
 
 namespace zeek::llanalyzer {
 
-class TreeMapDispatcher : public Dispatcher	{
+class DictDispatcher : public Dispatcher	{
 public:
-	~TreeMapDispatcher() override;
+	~DictDispatcher() override;
 
 	bool Register(identifier_t identifier, Analyzer* analyzer, Dispatcher* dispatcher) override;
 	Value* Lookup(identifier_t identifier) const override;
@@ -17,7 +17,8 @@ public:
 	void DumpDebug() const override;
 
 private:
-	std::map<identifier_t, Value*> table;
+
+	PDict<Value> table;
 
 };
 }

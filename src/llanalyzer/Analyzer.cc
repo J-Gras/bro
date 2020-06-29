@@ -41,7 +41,7 @@ const char* Analyzer::GetAnalyzerName() const
 bool Analyzer::IsAnalyzer(const char* name)
 	{
 	assert(tag);
-	return strcmp(llanalyzer_mgr->GetComponentName(tag).c_str(), name) == 0;
+	return llanalyzer_mgr->GetComponentName(tag).compare(name) == 0;
 	}
 
 }
