@@ -35,12 +35,12 @@ void DictDispatcher::Clear()
 void DictDispatcher::DumpDebug() const
 	{
 #ifdef DEBUG
-	DBG_LOG(DBG_LLANALYZER, "  Dispatcher elements (used/total): %lu/%lu", Size(), table.size());
+	//DBG_LOG(DBG_LLANALYZER, "  Dispatcher elements (used/total): %lu/%lu", Size(), ?);
 	auto c = table.InitForIteration();
 	HashKey* k;
 	while ( Value* entry = table.NextEntry(k, c) )
 		{
-		identifier_t* id = reinterpret_cast<identifier_t*>(k->Key());
+		const identifier_t* id = reinterpret_cast<const identifier_t*>(k->Key());
 		DBG_LOG(DBG_LLANALYZER, "    %#8x => %s, %p", *id, entry->analyzer->GetAnalyzerName(), entry->dispatcher);
 		}
 #endif
