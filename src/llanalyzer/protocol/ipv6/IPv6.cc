@@ -3,7 +3,7 @@
 using namespace zeek::llanalyzer::IPv6;
 
 IPv6Analyzer::IPv6Analyzer()
-	: zeek::llanalyzer::Analyzer("IPv6Analyzer")
+	: zeek::llanalyzer::Analyzer("IPv6")
 	{
 	}
 

@@ -3,7 +3,7 @@
 using namespace zeek::llanalyzer::LinuxSLL;
 
 LinuxSLLAnalyzer::LinuxSLLAnalyzer()
-	: zeek::llanalyzer::Analyzer("LinuxSLLAnalyzer")
+	: zeek::llanalyzer::Analyzer("LinuxSLL")
 	{
 	}
 

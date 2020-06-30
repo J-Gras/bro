@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
     zeek::plugin::Configuration Configure()
         {
-        AddComponent(new zeek::llanalyzer::Component("VLANAnalyzer",
+        AddComponent(new zeek::llanalyzer::Component("VLAN",
                          zeek::llanalyzer::VLAN::VLANAnalyzer::Instantiate));
 
         zeek::plugin::Configuration config;
-        config.name = "LLAnalyzer::VLANAnalyzer";
-        config.description = "A wrapper for the original zeek code.";
+        config.name = "LLAnalyzer::VLAN";
+        config.description = "VLAN LL-Analyzer";
         return config;
         }
 

@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::NFLog;
 
 NFLogAnalyzer::NFLogAnalyzer()
-	: zeek::llanalyzer::Analyzer("NFLogAnalyzer")
+	: zeek::llanalyzer::Analyzer("NFLog")
 	{
 	}
 

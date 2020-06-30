@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("MPLSAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("MPLS",
 		                 zeek::llanalyzer::MPLS::MPLSAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::MPLSAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::MPLS";
+		config.description = "MPLS LL-Analyzer";
 		return config;
 		}
 

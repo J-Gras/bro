@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::Wrapper;
 
 WrapperAnalyzer::WrapperAnalyzer()
-	: zeek::llanalyzer::Analyzer("WrapperAnalyzer")
+	: zeek::llanalyzer::Analyzer("Wrapper")
 	{
 	}
 

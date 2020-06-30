@@ -3,7 +3,7 @@
 using namespace zeek::llanalyzer::MPLS;
 
 MPLSAnalyzer::MPLSAnalyzer()
-	: zeek::llanalyzer::Analyzer("MPLSAnalyzer")
+	: zeek::llanalyzer::Analyzer("MPLS")
 	{
 	}
 

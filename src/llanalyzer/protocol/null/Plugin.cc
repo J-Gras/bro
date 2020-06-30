@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("NullAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("Null",
 		                 zeek::llanalyzer::Null::NullAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::NullAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::Null";
+		config.description = "Null LL-Analyzer";
 		return config;
 		}
 

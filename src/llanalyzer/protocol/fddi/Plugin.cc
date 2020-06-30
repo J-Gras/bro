@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("FDDIAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("FDDI",
 		                 zeek::llanalyzer::FDDI::FDDIAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::FDDIAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::FDDI";
+		config.description = "FDDI LL-Analyzer";
 		return config;
 		}
 

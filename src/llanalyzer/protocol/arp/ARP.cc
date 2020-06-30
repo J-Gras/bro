@@ -3,7 +3,7 @@
 using namespace zeek::llanalyzer::ARP;
 
 ARPAnalyzer::ARPAnalyzer()
-	: zeek::llanalyzer::Analyzer("ARPAnalyzer")
+	: zeek::llanalyzer::Analyzer("ARP")
 	{
 	}
 

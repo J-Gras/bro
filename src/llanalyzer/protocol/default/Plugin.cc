@@ -13,7 +13,7 @@ public:
 
 		zeek::plugin::Configuration config;
 		config.name = "LLAnalyzer::DefaultAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.description = "Default LL-Analyzer for IP fallback";
 		return config;
 		}
 

@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::VLAN;
 
 VLANAnalyzer::VLANAnalyzer()
-	: zeek::llanalyzer::Analyzer("VLANAnalyzer")
+	: zeek::llanalyzer::Analyzer("VLAN")
 	{
 	}
 

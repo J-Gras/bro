@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::PPPSerial;
 
 PPPSerialAnalyzer::PPPSerialAnalyzer()
-	: zeek::llanalyzer::Analyzer("PPPSerialAnalyzer")
+	: zeek::llanalyzer::Analyzer("PPPSerial")
 	{
 	}
 

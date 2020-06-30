@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("IPv4Analyzer",
+		AddComponent(new zeek::llanalyzer::Component("IPv4",
 		                 zeek::llanalyzer::IPv4::IPv4Analyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::IPv4Analyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::IPv4";
+		config.description = "IPv4 LL-Analyzer";
 		return config;
 		}
 

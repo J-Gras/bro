@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("NFLogAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("NFLog",
 		                 zeek::llanalyzer::NFLog::NFLogAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::NFLogAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::NFLog";
+		config.description = "NFLog LL-Analyzer";
 		return config;
 		}
 } plugin;

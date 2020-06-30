@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("PPPSerialAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("PPPSerial",
 		                 zeek::llanalyzer::PPPSerial::PPPSerialAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::PPPSerialAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::PPPSerial";
+		config.description = "PPPSerial LL-Analyzer";
 		return config;
 		}
 

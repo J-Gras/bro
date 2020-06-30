@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("IEEE802_11_RadioAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("IEEE802_11_Radio",
 		                 zeek::llanalyzer::IEEE802_11_Radio::IEEE802_11_RadioAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::IEEE802_11_RadioAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::IEEE802_11_Radio";
+		config.description = "IEEE 802.11 Radiotap LL-Analyzer";
 		return config;
 		}
 

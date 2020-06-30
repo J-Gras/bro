@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::IEEE802_11;
 
 IEEE802_11Analyzer::IEEE802_11Analyzer()
-	: zeek::llanalyzer::Analyzer("IEEE802_11Analyzer")
+	: zeek::llanalyzer::Analyzer("IEEE802_11")
 	{
 	}
 

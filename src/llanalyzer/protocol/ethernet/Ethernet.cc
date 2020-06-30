@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::Ethernet;
 
 EthernetAnalyzer::EthernetAnalyzer()
-	: zeek::llanalyzer::Analyzer("EthernetAnalyzer")
+	: zeek::llanalyzer::Analyzer("Ethernet")
 	{
 	}
 

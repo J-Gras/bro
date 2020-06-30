@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::FDDI;
 
 FDDIAnalyzer::FDDIAnalyzer()
-	: zeek::llanalyzer::Analyzer("FDDIAnalyzer")
+	: zeek::llanalyzer::Analyzer("FDDI")
 	{
 	}
 

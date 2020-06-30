@@ -6,7 +6,7 @@
 using namespace zeek::llanalyzer::IEEE802_11_Radio;
 
 IEEE802_11_RadioAnalyzer::IEEE802_11_RadioAnalyzer()
-	: zeek::llanalyzer::Analyzer("IEEE802_11_RadioAnalyzer")
+	: zeek::llanalyzer::Analyzer("IEEE802_11_Radio")
 	{
 	}
 

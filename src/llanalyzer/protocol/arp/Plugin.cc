@@ -8,12 +8,12 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("ARPAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("ARP",
 		                 zeek::llanalyzer::ARP::ARPAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::ARPAnalyzer";
-		config.description = "A wrapper for the original zeek code.";
+		config.name = "LLAnalyzer::ARP";
+		config.description = "ARP LL-Analyzer";
 		return config;
 		}
 

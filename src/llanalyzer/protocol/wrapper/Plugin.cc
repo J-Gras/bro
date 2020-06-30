@@ -8,11 +8,11 @@ class Plugin : public zeek::plugin::Plugin {
 public:
 	zeek::plugin::Configuration Configure()
 		{
-		AddComponent(new zeek::llanalyzer::Component("WrapperAnalyzer",
+		AddComponent(new zeek::llanalyzer::Component("Wrapper",
 		                 zeek::llanalyzer::Wrapper::WrapperAnalyzer::Instantiate));
 
 		zeek::plugin::Configuration config;
-		config.name = "LLAnalyzer::WrapperAnalyzer";
+		config.name = "LLAnalyzer::Wrapper";
 		config.description = "A wrapper for the original zeek code.";
 		return config;
 		}

@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::PPPoE;
 
 PPPoEAnalyzer::PPPoEAnalyzer()
-	: zeek::llanalyzer::Analyzer("PPPoEAnalyzer")
+	: zeek::llanalyzer::Analyzer("PPPoE")
 	{
 	}
 

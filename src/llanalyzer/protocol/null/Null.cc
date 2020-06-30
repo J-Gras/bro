@@ -4,7 +4,7 @@
 using namespace zeek::llanalyzer::Null;
 
 NullAnalyzer::NullAnalyzer()
-	: zeek::llanalyzer::Analyzer("NullAnalyzer")
+	: zeek::llanalyzer::Analyzer("Null")
 	{
 	}
 
