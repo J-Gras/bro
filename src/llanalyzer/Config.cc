@@ -20,11 +20,11 @@ const std::map<identifier_t, std::string>& DispatcherConfig::GetMappings() const
 void DispatcherConfig::AddMapping(identifier_t identifier,
 								  const std::string& analyzer_name)
 	{
-	DBG_LOG(DBG_LLANALYZER, "Adding configuration mapping: %s -> %d -> %s",
+	DBG_LOG(DBG_LLANALYZER, "Adding configuration mapping: %s -> %#x -> %s",
 	        name.c_str(), identifier, analyzer_name.c_str());
 
 	if ( mappings.count(identifier) )
-		reporter->InternalError("Invalid config, identifier %x already exists "
+		reporter->InternalError("Invalid config, identifier %#x already exists "
 		                        "for dispatcher set %s.",
 		                        identifier, name.c_str());
 
