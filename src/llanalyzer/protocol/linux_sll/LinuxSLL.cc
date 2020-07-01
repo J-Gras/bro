@@ -11,9 +11,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Lin
 	{
 	auto& pdata = packet->cur_pos;
 
-	// See https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL.html
-
-	if ( pdata + 16 >= packet->GetEndOfData() )
+	if ( pdata + sizeof(SLLHeader) >= packet->GetEndOfData() )
 		{
 		packet->Weird("truncated_Linux_SLL_header");
 		return { AnalyzerResult::Failed, 0 };
@@ -22,7 +20,8 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Lin
 	auto hdr = (const SLLHeader*)pdata;
 	//TODO: Handle different ARPHRD_types
 	identifier_t protocol = ntohs(hdr->protocol_type);
+	packet->l2_src = (u_char*) &(hdr->addr);
 
-	pdata += 16;
+	pdata += sizeof(SLLHeader);
 	return { AnalyzerResult::Continue, protocol };
 	}
