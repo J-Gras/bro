@@ -81,6 +81,8 @@ public:
 		{
 		if ( copy )
 			delete [] data;
+		if ( cleanup_l2_dst )
+			delete l2_dst;
 		}
 
 	/**
@@ -224,6 +226,15 @@ public:
 	 * hardware/kernel before being received by zeek.
 	 */
 	bool l3_checksummed;
+
+	/**
+	 * Set to true if the l2_dst was instantiated separately from the
+	 * rest of the data so it can be cleaned up during the
+	 * destructor for Packet. For example, the LinuxSLL llanalyzer
+	 * allocates space for the l2_dst because SLL doesn't have a
+	 * destination address in the header.
+	 */
+	bool cleanup_l2_dst = false;
 
 	// Wrapper to generate a packet-level weird. Has to be public for llanalyzers to use it.
 	void Weird(const char* name);

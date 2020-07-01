@@ -17,10 +17,18 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Lin
 		return { AnalyzerResult::Failed, 0 };
 		}
 
-	auto hdr = (const SLLHeader*)pdata;
 	//TODO: Handle different ARPHRD_types
+	auto hdr = (const SLLHeader*)pdata;
+
 	identifier_t protocol = ntohs(hdr->protocol_type);
 	packet->l2_src = (u_char*) &(hdr->addr);
+
+	// SLL doesn't include a destination address in the header, but not setting l2_dst to something
+	// here will cause crashes elsewhere.
+	u_char* empty_dst = new u_char[6];
+	memset(empty_dst, 0, 6);
+	packet->l2_dst = empty_dst;
+	packet->cleanup_l2_dst = true;
 
 	pdata += sizeof(SLLHeader);
 	return { AnalyzerResult::Continue, protocol };
