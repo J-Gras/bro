@@ -112,7 +112,7 @@ void VectorDispatcher::DumpDebug() const
 	for ( size_t i = 0; i < table.size(); i++ )
 		{
 		if ( table[i] != nullptr )
-			DBG_LOG(DBG_LLANALYZER, "    %#8lx => %s, %p", i, table[i]->analyzer->GetAnalyzerName(), table[i]->dispatcher);
+			DBG_LOG(DBG_LLANALYZER, "    %#8lx => %s, %p", i+lowest_identifier, table[i]->analyzer->GetAnalyzerName(), table[i]->dispatcher);
 		}
 #endif
 	}
