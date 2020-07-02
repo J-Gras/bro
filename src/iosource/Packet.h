@@ -236,9 +236,6 @@ public:
 	void Weird(const char* name);
 
 private:
-	// Calculate layer 2 attributes.
-	void ProcessLayer2();
-
 	// Renders an MAC address into its ASCII representation.
 	IntrusivePtr<Val> FmtEUI48(const u_char* mac) const;
 
