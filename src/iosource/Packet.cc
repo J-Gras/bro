@@ -45,7 +45,7 @@ void Packet::Init(int arg_link_type, pkt_timeval *arg_ts, uint32_t arg_caplen,
 		data = arg_data;
 
 	time = ts.tv_sec + double(ts.tv_usec) / 1e6;
-	hdr_size = GetLinkHeaderSize(arg_link_type);
+	hdr_size = 0;
 	eth_type = 0;
 	vlan = 0;
 	inner_vlan = 0;
@@ -58,14 +58,8 @@ void Packet::Init(int arg_link_type, pkt_timeval *arg_ts, uint32_t arg_caplen,
 	l3_proto = L3_UNKNOWN;
 	l3_checksummed = false;
 
-	// for llanalyzer: cur_pos points to the next payload
+	// For ll-analyzer: cur_pos points to the next payload.
 	cur_pos = data;
-
-	if ( data && cap_len < hdr_size )
-		{
-		Weird("truncated_link_header");
-		return;
-		}
 
 	if ( data )
 		{
@@ -73,6 +67,8 @@ void Packet::Init(int arg_link_type, pkt_timeval *arg_ts, uint32_t arg_caplen,
 		// an issue, it will call Packet::Weird(), which sets l2_valid to false.
 		l2_valid = true;
 		llanalyzer_mgr->ProcessPacket(this);
+		// Calculate header size after processing lower layers.
+		hdr_size = cur_pos - data;
 		}
 	}
 
@@ -85,47 +81,6 @@ void Packet::Weird(const char* name)
 	{
 	sessions->Weird(name, this);
 	l2_valid = false;
-	}
-
-int Packet::GetLinkHeaderSize(int link_type)
-	{
-	switch ( link_type ) {
-	case DLT_NULL:
-		return 4;
-
-	case DLT_EN10MB:
-		return 14;
-
-	case DLT_FDDI:
-		return 13 + 8;	// fddi_header + LLC
-
-#ifdef DLT_LINUX_SLL
-	case DLT_LINUX_SLL:
-		return 16;
-#endif
-
-	case DLT_PPP_SERIAL:	// PPP_SERIAL
-		return 4;
-
-	case DLT_IEEE802_11:  // 802.11 monitor
-		return 34;
-
-	case DLT_IEEE802_11_RADIO:	// 802.11 plus RadioTap
-		return 59;
-
-	case DLT_NFLOG:
-		// Linux netlink NETLINK NFLOG socket log messages
-		// The actual header size is variable, but we return the minimum
-		// expected size here, which is 4 bytes for the main header plus at
-		// least 2 bytes each for the type and length values assoicated with
-		// the final TLV carrying the packet payload.
-		return 8;
-
-	case DLT_RAW:
-		return 0;
-	}
-
-	return -1;
 	}
 
 const u_char* const Packet::GetEndOfData() const

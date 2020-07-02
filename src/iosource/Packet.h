@@ -120,7 +120,7 @@ public:
 
 	/**
 	 * Interprets the Layer 3 of the packet as IP and returns a
-	 * correspondign object.
+	 * corresponding object.
 	 */
 	const IP_Hdr IP() const;
 
@@ -132,16 +132,6 @@ public:
 
 	[[deprecated("Remove in v4.1.  Use ToRawPktHdrval() instead.")]]
 	RecordVal* BuildPktHdrVal() const;
-
-	/**
-	 * Static method returning the link-layer header size for a given
-	 * link type.
-	 *
-	 * @param link_type The link tyoe.
-	 *
-	 * @return The header size in bytes, or -1 if not known.
-	 */
-	static int GetLinkHeaderSize(int link_type);
 
 	/**
 	 * Returns the end of the captured data for bound checking.
