@@ -180,8 +180,28 @@ IntrusivePtr<Val> Packet::FmtEUI48(const u_char* mac) const
 
 void Packet::Describe(ODesc* d) const
 	{
-	const IP_Hdr ip = IP();
-	d->Add(ip.SrcAddr());
-	d->Add("->");
-	d->Add(ip.DstAddr());
+	switch ( l3_proto )
+		{
+		case L3_ARP:
+			d->Add("ARP");
+			break;
+		case L3_IPV4:
+			d->Add("IPv4");
+			break;
+		case L3_IPV6:
+			d->Add("IPv6");
+			break;
+		default:
+			d->Add("Unknown L3 protocol");
+		}
+
+	// Add IP-specific information
+	if ( l3_proto == L3_IPV4 || l3_proto == L3_IPV6 )
+		{
+		const IP_Hdr ip = IP();
+		d->Add(": ");
+		d->Add(ip.SrcAddr());
+		d->Add("->");
+		d->Add(ip.DstAddr());
+		}
 	}
