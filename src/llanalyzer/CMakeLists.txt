@@ -15,7 +15,6 @@ set(llanalyzer_SRCS
     Component.cc
     Tag.cc
     Config.cc
-    Timing.cc
 )
 
 bro_add_subdir_library(llanalyzer ${llanalyzer_SRCS})
