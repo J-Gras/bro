@@ -5,8 +5,6 @@
 #include "zeek-config.h"
 #include "../Tag.h"
 
-class EnumVal;
-
 namespace zeek::plugin {
 	template <class T> class TaggedComponent;
 	template <class T, class C>	class ComponentManager;

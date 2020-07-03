@@ -221,7 +221,6 @@ set(MAIN_SRCS
     Base64.cc
     BifReturnVal.cc
     Brofiler.cc
-    BroString.cc
     CCL.cc
     CompHash.cc
     Conn.cc
@@ -291,6 +290,7 @@ set(MAIN_SRCS
     Var.cc
     WeirdState.cc
     ZeekArgs.cc
+    ZeekString.cc
     legacy-netvar-init.cc
     bsd-getopt-long.c
     bro_inet_ntop.c

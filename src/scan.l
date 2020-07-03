@@ -15,7 +15,7 @@
 #include "input.h"
 #include "util.h"
 #include "Scope.h"
-#include "BroString.h"
+#include "ZeekString.h"
 #include "DNS_Mgr.h"
 #include "Expr.h"
 #include "Func.h"
@@ -139,7 +139,7 @@ public:
 
 // A stack of input buffers we're scanning.  file_stack[len-1] is the
 // top of the stack.
-static PList<FileInfo> file_stack;
+static zeek::PList<FileInfo> file_stack;
 
 #define RET_CONST(v) \
 	{ \
@@ -179,7 +179,7 @@ ESCSEQ	(\\([^\n]|[0-7]+|x[[:xdigit:]]+))
 
 ##<.* {
 	std::string hint(cur_enum_type && last_id_tok ?
-	            make_full_var_name(current_module.c_str(), last_id_tok) : "");
+	            make_full_var_name(zeek::detail::current_module.c_str(), last_id_tok) : "");
 
 	zeekygen_mgr->PostComment(yytext + 3, hint);
 }
@@ -203,22 +203,22 @@ ESCSEQ	(\\([^\n]|[0-7]+|x[[:xdigit:]]+))
 
 	/* IPv6 literal constant patterns */
 {IP6}	{
-	RET_CONST(new AddrVal(extract_ip(yytext)))
+	RET_CONST(new zeek::AddrVal(extract_ip(yytext)))
 }
 
 {IP6}{OWS}"/"{OWS}{D}	{
 	int len = 0;
 	std::string ip = extract_ip_and_len(yytext, &len);
-	RET_CONST(new SubNetVal(IPPrefix(IPAddr(ip), len, true)))
+	RET_CONST(new zeek::SubNetVal(IPPrefix(IPAddr(ip), len, true)))
 }
 
 	/* IPv4 literal constant patterns */
-({D}"."){3}{D}		RET_CONST(new AddrVal(yytext))
+({D}"."){3}{D}		RET_CONST(new zeek::AddrVal(yytext))
 
 ({D}"."){3}{D}{OWS}"/"{OWS}{D}	{
 	int len = 0;
 	std::string ip = extract_ip_and_len(yytext, &len);
-	RET_CONST(new SubNetVal(IPPrefix(IPAddr(ip), len)))
+	RET_CONST(new zeek::SubNetVal(IPPrefix(IPAddr(ip), len)))
 }
 
 [!%*/+\-,:;<=>?()\[\]{}~$|&^]	return yytext[0];
@@ -346,11 +346,11 @@ when	return TOK_WHEN;
 			rval = std::string(path) + "/" + rval;
 		}
 
-	RET_CONST(new StringVal(rval.c_str()));
+	RET_CONST(new zeek::StringVal(rval.c_str()));
 	}
 
 @FILENAME	{
-	RET_CONST(new StringVal(SafeBasename(::filename).result));
+	RET_CONST(new zeek::StringVal(SafeBasename(::filename).result));
 	}
 
 @load{WS}{FILE}	{
@@ -468,8 +468,8 @@ when	return TOK_WHEN;
 <IGNORE>[^@\n]+	/* eat */
 <IGNORE>.	/* eat */
 
-T	RET_CONST(val_mgr->True()->Ref())
-F	RET_CONST(val_mgr->False()->Ref())
+T	RET_CONST(zeek::val_mgr->True()->Ref())
+F	RET_CONST(zeek::val_mgr->False()->Ref())
 
 {ID}	{
 	yylval.str = copy_string(yytext);
@@ -478,9 +478,9 @@ F	RET_CONST(val_mgr->False()->Ref())
 	}
 
 {D}		{
-		RET_CONST(val_mgr->Count(static_cast<bro_uint_t>(strtoull(yytext, (char**) NULL, 10))).release())
+		RET_CONST(zeek::val_mgr->Count(static_cast<bro_uint_t>(strtoull(yytext, (char**) NULL, 10))).release())
 		}
-{FLOAT}		RET_CONST(new DoubleVal(atof(yytext)))
+{FLOAT}		RET_CONST(new zeek::DoubleVal(atof(yytext)))
 
 {D}"/tcp"	{
 		uint32_t p = atoi(yytext);
@@ -489,7 +489,7 @@ F	RET_CONST(val_mgr->False()->Ref())
 			reporter->Error("bad port number - %s", yytext);
 			p = 0;
 			}
-		RET_CONST(val_mgr->Port(p, TRANSPORT_TCP)->Ref())
+		RET_CONST(zeek::val_mgr->Port(p, TRANSPORT_TCP)->Ref())
 		}
 {D}"/udp"	{
 		uint32_t p = atoi(yytext);
@@ -498,7 +498,7 @@ F	RET_CONST(val_mgr->False()->Ref())
 			reporter->Error("bad port number - %s", yytext);
 			p = 0;
 			}
-		RET_CONST(val_mgr->Port(p, TRANSPORT_UDP)->Ref())
+		RET_CONST(zeek::val_mgr->Port(p, TRANSPORT_UDP)->Ref())
 		}
 {D}"/icmp"	{
 		uint32_t p = atoi(yytext);
@@ -507,7 +507,7 @@ F	RET_CONST(val_mgr->False()->Ref())
 			reporter->Error("bad port number - %s", yytext);
 			p = 0;
 			}
-		RET_CONST(val_mgr->Port(p, TRANSPORT_ICMP)->Ref())
+		RET_CONST(zeek::val_mgr->Port(p, TRANSPORT_ICMP)->Ref())
 		}
 {D}"/unknown"	{
 		uint32_t p = atoi(yytext);
@@ -516,17 +516,17 @@ F	RET_CONST(val_mgr->False()->Ref())
 			reporter->Error("bad port number - %s", yytext);
 			p = 0;
 			}
-		RET_CONST(val_mgr->Port(p, TRANSPORT_UNKNOWN)->Ref())
+		RET_CONST(zeek::val_mgr->Port(p, TRANSPORT_UNKNOWN)->Ref())
 		}
 
-{FLOAT}{OWS}day(s?)	RET_CONST(new IntervalVal(atof(yytext),Days))
-{FLOAT}{OWS}hr(s?)	RET_CONST(new IntervalVal(atof(yytext),Hours))
-{FLOAT}{OWS}min(s?)	RET_CONST(new IntervalVal(atof(yytext),Minutes))
-{FLOAT}{OWS}sec(s?)	RET_CONST(new IntervalVal(atof(yytext),Seconds))
-{FLOAT}{OWS}msec(s?)	RET_CONST(new IntervalVal(atof(yytext),Milliseconds))
-{FLOAT}{OWS}usec(s?)	RET_CONST(new IntervalVal(atof(yytext),Microseconds))
+{FLOAT}{OWS}day(s?)	RET_CONST(new zeek::IntervalVal(atof(yytext),Days))
+{FLOAT}{OWS}hr(s?)	RET_CONST(new zeek::IntervalVal(atof(yytext),Hours))
+{FLOAT}{OWS}min(s?)	RET_CONST(new zeek::IntervalVal(atof(yytext),Minutes))
+{FLOAT}{OWS}sec(s?)	RET_CONST(new zeek::IntervalVal(atof(yytext),Seconds))
+{FLOAT}{OWS}msec(s?)	RET_CONST(new zeek::IntervalVal(atof(yytext),Milliseconds))
+{FLOAT}{OWS}usec(s?)	RET_CONST(new zeek::IntervalVal(atof(yytext),Microseconds))
 
-"0x"{HEX}+	RET_CONST(val_mgr->Count(static_cast<bro_uint_t>(strtoull(yytext, 0, 16))).release())
+"0x"{HEX}+	RET_CONST(zeek::val_mgr->Count(static_cast<bro_uint_t>(strtoull(yytext, 0, 16))).release())
 
 {H}("."{H})+		RET_CONST(dns_mgr->LookupHost(yytext).release())
 
@@ -560,7 +560,7 @@ F	RET_CONST(val_mgr->False()->Ref())
 
 	s[i-1] = '\0';
 
-	RET_CONST(new StringVal(new BroString(1, (byte_vec) s, i-1)))
+	RET_CONST(new zeek::StringVal(new zeek::String(1, (zeek::byte_vec) s, i-1)))
 	}
 
 <RE>([^/\\\n]|{ESCSEQ})+	{
@@ -693,7 +693,7 @@ static int load_files(const char* orig_file)
 	// was done when we're finished processing it.
 	if ( ! did_module_restore )
 		{
-		file_stack.push_back(new FileInfo(current_module));
+		file_stack.push_back(new FileInfo(zeek::detail::current_module));
 		did_module_restore = true;
 		}
 	else
@@ -710,7 +710,7 @@ static int load_files(const char* orig_file)
 	yylloc.first_line = yylloc.last_line = line_number = 1;
 
 	// Don't delete the old filename - it's pointed to by
-	// every BroObj created when parsing it.
+	// every Obj created when parsing it.
 	yylloc.filename = filename = copy_string(file_path.c_str());
 
 	return 1;
@@ -749,7 +749,7 @@ void do_atif(zeek::detail::Expr* expr)
 
 	LocalNameFinder cb;
 	expr->Traverse(&cb);
-	IntrusivePtr<Val> val;
+	zeek::ValPtr val;
 
 	if ( cb.local_names.empty() )
 		val = expr->Eval(nullptr);
@@ -776,7 +776,7 @@ void do_atifdef(const char* id)
 	{
 	++current_depth;
 
-	const auto& i = lookup_ID(id, current_module.c_str());
+	const auto& i = zeek::detail::lookup_ID(id, zeek::detail::current_module.c_str());
 
 	if ( ! i )
 		{
@@ -789,7 +789,7 @@ void do_atifndef(const char *id)
 	{
 	++current_depth;
 
-	const auto& i = lookup_ID(id, current_module.c_str());
+	const auto& i = zeek::detail::lookup_ID(id, zeek::detail::current_module.c_str());
 
 	if ( i )
 		{
@@ -835,8 +835,8 @@ void do_atendif()
 // Be careful to never delete things from this list, as the strings
 // are referred to (in order to save the locations of tokens and statements,
 // for error reporting and debugging).
-static name_list input_files;
-static name_list essential_input_files;
+static zeek::name_list input_files;
+static zeek::name_list essential_input_files;
 
 void add_essential_input_file(const char* file)
 	{
@@ -871,7 +871,7 @@ void add_input_file_at_front(const char* file)
 		input_files.push_front(copy_string(file));
 	}
 
-void add_to_name_list(char* s, char delim, name_list& nl)
+void add_to_name_list(char* s, char delim, zeek::name_list& nl)
 	{
 	while ( s )
 		{
@@ -917,13 +917,13 @@ int yywrap()
 	// Stack is now empty.
 	while ( essential_input_files.length() > 0 || input_files.length() > 0 )
 		{
-		name_list& files = essential_input_files.length() > 0 ?
+		zeek::name_list& files = essential_input_files.length() > 0 ?
 		             essential_input_files : input_files;
 
 		if ( load_files(files[0]) )
 			{
 			// Don't delete the filename - it's pointed to by
-			// every BroObj created when parsing it.
+			// every Obj created when parsing it.
 			(void) files.remove_nth(0);
 			return 0;
 			}
@@ -978,40 +978,54 @@ int yywrap()
 		return 0;
 
 	// Add redef statements for any X=Y command line parameters.
-	if ( params.size() > 0 )
+	if ( ! params.empty() )
 		{
 		std::string policy;
 
-		for ( unsigned int i = 0; i < params.size(); ++i )
+		for ( const auto& pi : params )
 			{
-			char* param = copy_string(params[i].c_str());
-			char* eq = strchr(param, '=');
-			char* val = eq + 1;
+			auto p = pi.data();
 
-			*eq = '\0';
+			while ( isalnum(*p) || *p == '_' || *p == ':' ) ++p;
 
-			if ( strlen(val) == 0 )
+			auto first_non_id_char = p - pi.data();
+			auto eq_idx = pi.find('=', first_non_id_char);
+			// Omit the '=' from op just to make fmt string below clearer.
+			auto op = pi.substr(first_non_id_char, eq_idx - first_non_id_char);
+			auto id_str = pi.substr(0, first_non_id_char);
+			auto val_str = pi.substr(eq_idx + 1);
+			const auto& id = zeek::id::find(id_str);
+
+			if ( ! id )
 				{
-				delete [] param;
+				reporter->Error("unknown identifier '%s' in command-line options",
+				                id_str.data());
 				continue;
 				}
 
-			// Try to find the type of the param, and interpret
-			// the value intelligently for that type.  (So far,
-			// that just means quoting the value if it's a
-			// string type.)  If no type is found, the value
-			// is left unchanged.
-			std::string opt_quote;	// no optional quote by default
-			const auto& param_id = lookup_ID(param, GLOBAL_MODULE_NAME);
-			Val* v = param_id ? param_id->GetVal().get() : nullptr;
+			// Interpret the value based on the identifier's type.
+			// So far, that just means quoting the value for string types.
+			const auto& type = id->GetType();
 
-			if ( v && v->GetType() && v->GetType()->Tag() == zeek::TYPE_STRING )
-				opt_quote = "\"";	// use quotes
+			if ( ! type )
+				{
+				reporter->Error("can't set value of '%s' in command-line "
+				                "options: unknown type", id_str.data());
+				continue;
+				}
 
-			policy += std::string("redef ") + param + "="
-					+ opt_quote + val + opt_quote + ";";
+			if ( val_str.empty() && ! zeek::IsString(type->Tag()) )
+				{
+				reporter->Error("must assign non-empty value to '%s' in "
+				                "command-line options", id_str.data());
+				continue;
+				}
 
-			delete [] param;
+			auto use_quotes = zeek::IsString(type->Tag());
+			auto fmt_str = use_quotes ? "redef %s %s= \"%s\";"
+			                          : "redef %s %s= %s;";
+
+			policy += fmt(fmt_str, id_str.data(), op.data(), val_str.data());
 			}
 
 		params.clear();
@@ -1063,5 +1077,5 @@ FileInfo::~FileInfo()
 	yylloc.first_line = yylloc.last_line = line_number = line;
 
 	if ( restore_module != "" )
-		current_module = restore_module;
+		zeek::detail::current_module = restore_module;
 	}
