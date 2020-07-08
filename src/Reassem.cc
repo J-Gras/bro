@@ -120,7 +120,6 @@ DataBlockList::Insert(uint64_t seq, uint64_t upper, const u_char* data,
 	if ( block_map.empty() )
 		return Insert(seq, upper, data, block_map.end());
 
-//	std::cout << "--------------\n* Block Data *\n--------------" << std::endl << data << std::endl;
 	const auto& last = block_map.rbegin()->second;
 
 	// Special check for the common case of appending to the end.

@@ -10,7 +10,7 @@ Analyzer::Analyzer(std::string name)
 	Tag t = llanalyzer_mgr->GetComponentTag(name);
 
 	if ( ! t )
-		reporter->InternalError("unknown analyzer name %s", name.c_str());
+		reporter->InternalError("unknown llanalyzer name %s", name.c_str());
 
 	Init(t);
 	}

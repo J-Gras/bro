@@ -5280,18 +5280,18 @@ module LLAnalyzer;
 # identifier.
 export {
     type ConfigEntry : record {
-        # The parent analyzer's name. This analyzer will check for the identifier in the
+        # The parent analyzer. This analyzer will check for the *identifier* in the
         # packet data to know whether to call the next analyzer. This field is optional.
         # If it is not included, the identifier will attach to the "root" analyzer. This
         # means that the identifier will be searched for the initial packet header instead
         # of later headers.
-
         parent : LLAnalyzer::Tag &optional;
+
         # A numeric identifier that can be found in the packet data that denotes an
         # analyzer should be called.
         identifier : count;
 
-        # The name of the analyzer that matches the above identifier.
+        # The analyzer that corresponds to the above identifier.
         analyzer : LLAnalyzer::Tag;
     };
 
