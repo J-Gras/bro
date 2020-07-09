@@ -235,7 +235,7 @@ void Manager::ProcessPacket(Packet* packet)
 			case AnalyzerResult::Terminate:
 				DBG_LOG(DBG_LLANALYZER, "Done, last found layer identifier was %#x.", next_layer_id);
 				break;
-			default:
+			case AnalyzerResult::Failed:
 				DBG_LOG(DBG_LLANALYZER, "Analysis failed in %s", current_analyzer->GetAnalyzerName());
 			}
 #endif

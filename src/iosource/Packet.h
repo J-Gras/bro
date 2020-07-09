@@ -156,14 +156,14 @@ public:
 	/**
 	 * Maximal length of a layer 2 address.
 	 */
-	static const int l2_addr_len = 6;
+	static const int L2_ADDR_LEN = 6;
 
 	/**
 	 * Empty layer 2 address to be used as default value. For example, the
 	 * LinuxSLL llanalyzer doesn't have a destination address in the header
 	 * and thus sets it to this default address.
 	 */
-	static constexpr const u_char l2_empty_addr[l2_addr_len] = { 0 };
+	static constexpr const u_char L2_EMPTY_ADDR[L2_ADDR_LEN] = { 0 };
 
 	// These are passed in through the constructor.
 	std::string tag;		/// Used in serialization

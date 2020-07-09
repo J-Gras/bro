@@ -25,7 +25,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> Lin
 
 	// SLL doesn't include a destination address in the header, but not setting l2_dst to something
 	// here will cause crashes elsewhere.
-	packet->l2_dst = Packet::l2_empty_addr;
+	packet->l2_dst = Packet::L2_EMPTY_ADDR;
 
 	pdata += sizeof(SLLHeader);
 	return { AnalyzerResult::Continue, protocol };

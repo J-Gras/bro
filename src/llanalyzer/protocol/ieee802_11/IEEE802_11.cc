@@ -34,7 +34,7 @@ std::tuple<zeek::llanalyzer::AnalyzerResult, zeek::llanalyzer::identifier_t> IEE
 	// 'To DS' and 'From DS' flags set indicate use of the 4th
 	// address field.
 	if ( (pdata[1] & 0x03) == 0x03 )
-		len_80211 += packet->l2_addr_len;
+		len_80211 += packet->L2_ADDR_LEN;
 
 	// Look for the QoS indicator bit.
 	if ( (fc_80211 >> 4) & 0x08 )
