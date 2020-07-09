@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include "IEEE802_11_Radio.h"
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"

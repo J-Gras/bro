@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include "MPLS.h"
 
 using namespace zeek::llanalyzer::MPLS;

@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include "FDDI.h"
 #include "plugin/Plugin.h"
 #include "llanalyzer/Component.h"

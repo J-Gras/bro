@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include <pcap.h>
 
 #include "IEEE802_11_Radio.h"

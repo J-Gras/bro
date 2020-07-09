@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include "Config.h"
 #include "Reporter.h"
 #include "DebugLogger.h"

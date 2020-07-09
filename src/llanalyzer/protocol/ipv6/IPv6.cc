@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include "IPv6.h"
 
 using namespace zeek::llanalyzer::IPv6;

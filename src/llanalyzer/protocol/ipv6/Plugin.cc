@@ -1,3 +1,5 @@
+// See the file "COPYING" in the main distribution directory for copyright.
+
 #include "plugin/Plugin.h"
 #include "IPv6.h"
 #include "llanalyzer/Component.h"
