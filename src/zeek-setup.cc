@@ -54,7 +54,7 @@ extern "C" {
 #include "input/readers/raw/Raw.h"
 #include "analyzer/Manager.h"
 #include "analyzer/Tag.h"
-#include "llanalyzer/Manager.h"
+#include "packet_analysis/Manager.h"
 #include "plugin/Manager.h"
 #include "file_analysis/Manager.h"
 #include "zeekygen/Manager.h"
@@ -95,7 +95,7 @@ threading::Manager* thread_mgr = nullptr;
 input::Manager* input_mgr = nullptr;
 zeek::plugin::Manager* plugin_mgr = nullptr;
 analyzer::Manager* analyzer_mgr = nullptr;
-zeek::llanalyzer::Manager* llanalyzer_mgr = nullptr;
+zeek::packet_analysis::Manager* packet_mgr = nullptr;
 file_analysis::Manager* file_mgr = nullptr;
 zeekygen::Manager* zeekygen_mgr = nullptr;
 iosource::Manager* iosource_mgr = nullptr;
@@ -233,7 +233,7 @@ void done_with_network()
 	terminating = true;
 
 	analyzer_mgr->Done();
-	llanalyzer_mgr->Done();
+	packet_mgr->Done();
 	timer_mgr->Expire();
 	dns_mgr->Flush();
 	mgr.Drain();
@@ -304,7 +304,7 @@ void terminate_bro()
 
 	delete zeekygen_mgr;
 	delete analyzer_mgr;
-	delete llanalyzer_mgr;
+	delete packet_mgr;
 	delete file_mgr;
 	// broker_mgr, timer_mgr, and supervisor are deleted via iosource_mgr
 	delete iosource_mgr;
@@ -570,7 +570,7 @@ zeek::detail::SetupResult zeek::detail::setup(int argc, char** argv,
 	iosource_mgr = new iosource::Manager();
 	event_registry = new EventRegistry();
 	analyzer_mgr = new analyzer::Manager();
-	llanalyzer_mgr = new llanalyzer::Manager();
+	packet_mgr = new packet_analysis::Manager();
 	log_mgr = new logging::Manager();
 	input_mgr = new input::Manager();
 	file_mgr = new file_analysis::Manager();
@@ -665,7 +665,7 @@ zeek::detail::SetupResult zeek::detail::setup(int argc, char** argv,
 		}
 
 	analyzer_mgr->InitPostScript();
-	llanalyzer_mgr->InitPostScript();
+	packet_mgr->InitPostScript();
 	file_mgr->InitPostScript();
 	dns_mgr->InitPostScript();
 
@@ -866,7 +866,7 @@ zeek::detail::SetupResult zeek::detail::setup(int argc, char** argv,
 	broker_mgr->ZeekInitDone();
 	reporter->ZeekInitDone();
 	analyzer_mgr->DumpDebug();
-	llanalyzer_mgr->DumpDebug();
+	packet_mgr->DumpDebug();
 
 	have_pending_timers = ! reading_traces && timer_mgr->Size() > 0;
 
