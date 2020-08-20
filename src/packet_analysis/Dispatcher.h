@@ -2,42 +2,30 @@
 
 #pragma once
 
-#include <utility>
-#include "Analyzer.h"
+#include <memory>
+#include <map>
+#include <cstdint>
 
 namespace zeek::packet_analysis {
 
-class Dispatcher; // Forward decl for Value
-using DispatcherPtr = std::shared_ptr<Dispatcher>;
+class Analyzer; // Forward declaration for Value
+using AnalyzerPtr = std::shared_ptr<zeek::packet_analysis::Analyzer>;
 
-using register_pair = std::pair<uint32_t, std::pair<AnalyzerPtr, DispatcherPtr>>;
-using register_map = std::map<uint32_t, std::pair<AnalyzerPtr, DispatcherPtr>>;
-
-class Value {
-public:
-	AnalyzerPtr analyzer;
-	DispatcherPtr dispatcher;
-
-	Value(AnalyzerPtr analyzer, DispatcherPtr dispatcher)
-		: analyzer(analyzer), dispatcher(dispatcher)
-		{
-		}
-};
-
-using ValuePtr = std::shared_ptr<Value>;
+using register_pair = std::pair<uint32_t, AnalyzerPtr>;
+using register_map = std::map<uint32_t, AnalyzerPtr>;
 
 class Dispatcher {
 public:
 	Dispatcher()
-		: table(std::vector<ValuePtr>(1, nullptr))
+		: table(std::vector<AnalyzerPtr>(1, nullptr))
 		{ }
 
 	~Dispatcher();
 
-	bool Register(uint32_t identifier, AnalyzerPtr analyzer, DispatcherPtr dispatcher);
+	bool Register(uint32_t identifier, AnalyzerPtr analyzer);
 	void Register(const register_map& data);
 
-	ValuePtr Lookup(uint32_t identifier) const;
+	AnalyzerPtr Lookup(uint32_t identifier) const;
 
 	size_t Size() const;
 	void Clear();
@@ -45,7 +33,7 @@ public:
 
 private:
 	uint32_t lowest_identifier = 0;
-	std::vector<ValuePtr> table;
+	std::vector<AnalyzerPtr> table;
 
 	void FreeValues();
 
