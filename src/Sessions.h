@@ -229,8 +229,6 @@ protected:
 	using IPTunnelMap = std::map<IPPair, TunnelActivity>;
 	IPTunnelMap ip_tunnels;
 
-	analyzer::arp::ARP_Analyzer* arp_analyzer;
-
 	analyzer::stepping_stone::SteppingStoneManager* stp_manager;
 	Discarder* discarder;
 	PacketFilter* packet_filter;
