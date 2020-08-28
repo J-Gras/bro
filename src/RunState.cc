@@ -209,7 +209,7 @@ void expire_timers()
 			zeek::detail::max_timer_expires - current_dispatched);
 	}
 
-void dispatch_packet(const Packet* pkt)
+void dispatch_packet(const Packet* pkt, packet_analysis::PacketProcessor* processor)
 	{
 	if ( ! pkt->Layer2Valid() )
 		return;
@@ -249,7 +249,7 @@ void dispatch_packet(const Packet* pkt)
 			}
 		}
 
-	sessions->NextPacket(t, pkt);
+	processor->NextPacket(t, pkt);
 	event_mgr.Drain();
 
 	if ( sp )

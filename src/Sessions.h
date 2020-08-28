@@ -6,6 +6,7 @@
 #include "PacketFilter.h"
 #include "NetVar.h"
 #include "analyzer/protocol/tcp/Stats.h"
+#include "packet_analysis/PacketProcessor.h"
 
 #include <map>
 #include <utility>
@@ -48,13 +49,13 @@ struct SessionStats {
 	uint64_t num_packets;
 };
 
-class NetSessions {
+class NetSessions : public packet_analysis::PacketProcessor {
 public:
 	NetSessions();
-	~NetSessions();
+	~NetSessions() override;
 
 	// Main entry point for packet processing.
-	void NextPacket(double t, const Packet* pkt);
+	void NextPacket(double t, const Packet* pkt) override;
 
 	void Done();	// call to drain events before destructing
 

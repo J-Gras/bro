@@ -12,6 +12,8 @@ ZEEK_FORWARD_DECLARE_NAMESPACED(PktSrc, zeek, iosource);
 ZEEK_FORWARD_DECLARE_NAMESPACED(PktDumper, zeek, iosource);
 ZEEK_FORWARD_DECLARE_NAMESPACED(Packet, zeek);
 
+namespace zeek::packet_analysis { class PacketProcessor; }
+
 namespace zeek::run_state {
 namespace detail {
 
@@ -24,7 +26,7 @@ extern void get_final_stats();
 extern void finish_run(int drain_events);
 extern void delete_run();	// Reclaim all memory, etc.
 extern void update_network_time(double new_network_time);
-extern void dispatch_packet(const zeek::Packet* pkt);
+extern void dispatch_packet(const zeek::Packet* pkt, packet_analysis::PacketProcessor* processor);
 extern void expire_timers();
 extern void zeek_terminate_loop(const char* reason);
 
