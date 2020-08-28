@@ -30,10 +30,6 @@ PktSrc::PktSrc()
 	have_packet = false;
 	errbuf = "";
 	SetClosed(true);
-
-	first_timestamp = 0.0;
-	current_pseudo = 0.0;
-	first_wallclock = current_wallclock = 0;
 	}
 
 PktSrc::~PktSrc()
@@ -75,16 +71,12 @@ bool PktSrc::IsLive() const
 
 double PktSrc::CurrentPacketTimestamp()
 	{
-	return current_pseudo;
+	return run_state::current_packet_timestamp();
 	}
 
 double PktSrc::CurrentPacketWallClock()
 	{
-	// We stop time when we are suspended.
-	if ( run_state::is_processing_suspended() )
-		current_wallclock = util::current_time(true);
-
-	return current_wallclock;
+	return run_state::current_packet_wallclock();
 	}
 
 void PktSrc::Opened(const Properties& arg_props)
@@ -150,25 +142,6 @@ void PktSrc::InternalError(const std::string& msg)
 	reporter->InternalError("%s", msg.c_str());
 	}
 
-void PktSrc::ContinueAfterSuspend()
-	{
-	current_wallclock = util::current_time(true);
-	}
-
-double PktSrc::CheckPseudoTime()
-	{
-	if ( ! IsOpen() )
-		return 0;
-
-	if ( ! ExtractNextPacketInternal() )
-		return 0;
-
-	double pseudo_time = current_packet.time - first_timestamp;
-	double ct = (util::current_time(true) - first_wallclock) * run_state::pseudo_realtime;
-
-	return pseudo_time <= ct ? run_state::zeek_start_time + pseudo_time : 0;
-	}
-
 void PktSrc::InitSource()
 	{
 	Open();
@@ -188,34 +161,24 @@ void PktSrc::Process()
 	if ( ! ExtractNextPacketInternal() )
 		return;
 
+	// This is set here to avoid having to pass the packet source down into the processing
+	// methods unnecessarily.
 	run_state::detail::current_iosrc = this;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	run_state::detail::current_pktsrc = this;
 #pragma GCC diagnostic pop
 
-	if ( current_packet.Layer2Valid() )
-		{
-		if ( run_state::pseudo_realtime )
-			{
-			current_pseudo = CheckPseudoTime();
-			run_state::detail::dispatch_packet(current_pseudo, &current_packet);
-			if ( ! first_wallclock )
-				first_wallclock = util::current_time(true);
-			}
-
-		else
-			run_state::detail::dispatch_packet(current_packet.time, &current_packet);
-		}
-
-	have_packet = false;
-	DoneWithPacket();
+	run_state::detail::dispatch_packet(&current_packet);
 
 	run_state::detail::current_iosrc = nullptr;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	run_state::detail::current_pktsrc = nullptr;
 #pragma GCC diagnostic pop
+
+	have_packet = false;
+	DoneWithPacket();
 	}
 
 const char* PktSrc::Tag()
@@ -232,11 +195,11 @@ bool PktSrc::ExtractNextPacketInternal()
 
 	// Don't return any packets if processing is suspended (except for the
 	// very first packet which we need to set up times).
-	if ( run_state::is_processing_suspended() && first_timestamp )
+	if ( run_state::is_processing_suspended() && run_state::detail::first_timestamp )
 		return false;
 
 	if ( run_state::pseudo_realtime )
-		current_wallclock = util::current_time(true);
+		run_state::detail::current_wallclock = util::current_time(true);
 
 	if ( ExtractNextPacket(&current_packet) )
 		{
@@ -246,8 +209,8 @@ bool PktSrc::ExtractNextPacketInternal()
 			return false;
 			}
 
-		if ( ! first_timestamp )
-			first_timestamp = current_packet.time;
+		if ( ! run_state::detail::first_timestamp )
+			run_state::detail::first_timestamp = current_packet.time;
 
 		have_packet = true;
 		return true;
@@ -353,8 +316,9 @@ double PktSrc::GetNextTimeout()
 	if ( ! have_packet )
 		ExtractNextPacketInternal();
 
-	double pseudo_time = current_packet.time - first_timestamp;
-	double ct = (util::current_time(true) - first_wallclock) * run_state::pseudo_realtime;
+	// This duplicates the calculation used in run_state::check_pseudo_time().
+	double pseudo_time = current_packet.time - run_state::detail::first_timestamp;
+	double ct = (util::current_time(true) - run_state::detail::first_wallclock) * run_state::pseudo_realtime;
 	return std::max(0.0, pseudo_time - ct);
 	}
 

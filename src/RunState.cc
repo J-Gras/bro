@@ -51,6 +51,10 @@ iosource::PktDumper* pkt_dumper = nullptr;
 iosource::PktSrc* current_pktsrc = nullptr;
 iosource::IOSource* current_iosrc = nullptr;
 bool have_pending_timers = false;
+double first_wallclock = 0.0;
+double first_timestamp = 0.0;
+double current_wallclock = 0.0;
+double current_pseudo = 0.0;
 
 RETSIGTYPE watchdog(int /* signo */)
 	{
@@ -205,8 +209,13 @@ void expire_timers()
 			zeek::detail::max_timer_expires - current_dispatched);
 	}
 
-void dispatch_packet(double t, const Packet* pkt)
+void dispatch_packet(const Packet* pkt)
 	{
+	if ( ! pkt->Layer2Valid() )
+		return;
+
+	double t = run_state::pseudo_realtime ? check_pseudo_time(pkt) : pkt->time;
+
 	if ( ! zeek_start_network_time )
 		{
 		zeek_start_network_time = t;
@@ -252,6 +261,9 @@ void dispatch_packet(double t, const Packet* pkt)
 
 	processing_start_time = 0.0;	// = "we're not processing now"
 	current_dispatched = 0;
+
+	if ( pseudo_realtime && ! first_wallclock )
+		first_wallclock = util::current_time(true);
 	}
 
 void run_loop()
@@ -390,7 +402,30 @@ void delete_run()
 		delete zeek::detail::ip_anonymizer[i];
 	}
 
+double check_pseudo_time(const Packet* pkt)
+	{
+	double pseudo_time = pkt->time - first_timestamp;
+	double ct = (util::current_time(true) - first_wallclock) * pseudo_realtime;
+
+	current_pseudo = pseudo_time <= ct ? zeek_start_time + pseudo_time : 0;
+	return current_pseudo;
+	}
+
 } // namespace detail
+
+extern double current_packet_timestamp()
+	{
+	return detail::current_pseudo;
+	}
+
+extern double current_packet_wallclock()
+	{
+	// We stop time when we are suspended.
+	if ( run_state::is_processing_suspended() )
+		detail::current_wallclock = util::current_time(true);
+
+	return detail::current_wallclock;
+	}
 
 bool reading_live = false;
 bool reading_traces = false;
@@ -422,8 +457,7 @@ void continue_processing()
 	if ( _processing_suspended == 1 )
 		{
 		reporter->Info("processing continued");
-		if ( iosource::PktSrc* ps = iosource_mgr->GetPktSrc() )
-			ps->ContinueAfterSuspend();
+		detail::current_wallclock = util::current_time(true);
 		}
 
 	--_processing_suspended;
