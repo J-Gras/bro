@@ -31,7 +31,6 @@ PktSrc::PktSrc()
 	errbuf = "";
 	SetClosed(true);
 
-	next_sync_point = 0;
 	first_timestamp = 0.0;
 	current_pseudo = 0.0;
 	first_wallclock = current_wallclock = 0;
@@ -189,22 +188,34 @@ void PktSrc::Process()
 	if ( ! ExtractNextPacketInternal() )
 		return;
 
+	run_state::detail::current_iosrc = this;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+	run_state::detail::current_pktsrc = this;
+#pragma GCC diagnostic pop
+
 	if ( current_packet.Layer2Valid() )
 		{
 		if ( run_state::pseudo_realtime )
 			{
 			current_pseudo = CheckPseudoTime();
-			run_state::detail::dispatch_packet(current_pseudo, &current_packet, this);
+			run_state::detail::dispatch_packet(current_pseudo, &current_packet);
 			if ( ! first_wallclock )
 				first_wallclock = util::current_time(true);
 			}
 
 		else
-			run_state::detail::dispatch_packet(current_packet.time, &current_packet, this);
+			run_state::detail::dispatch_packet(current_packet.time, &current_packet);
 		}
 
 	have_packet = false;
 	DoneWithPacket();
+
+	run_state::detail::current_iosrc = nullptr;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+	run_state::detail::current_pktsrc = nullptr;
+#pragma GCC diagnostic pop
 	}
 
 const char* PktSrc::Tag()

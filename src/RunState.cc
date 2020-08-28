@@ -196,7 +196,7 @@ void init_run(const std::optional<std::string>& interface,
 		}
 	}
 
-void expire_timers(iosource::PktSrc* src_ps)
+void expire_timers()
 	{
 	zeek::detail::SegmentProfiler prof(zeek::detail::segment_logger, "expiring-timers");
 
@@ -205,7 +205,7 @@ void expire_timers(iosource::PktSrc* src_ps)
 			zeek::detail::max_timer_expires - current_dispatched);
 	}
 
-void dispatch_packet(double t, const Packet* pkt, iosource::PktSrc* src_ps)
+void dispatch_packet(double t, const Packet* pkt)
 	{
 	if ( ! zeek_start_network_time )
 		{
@@ -217,12 +217,8 @@ void dispatch_packet(double t, const Packet* pkt, iosource::PktSrc* src_ps)
 
 	// network_time never goes back.
 	update_network_time(zeek::detail::timer_mgr->Time() < t ? t : zeek::detail::timer_mgr->Time());
-
-	current_pktsrc = src_ps;
-	current_iosrc = src_ps;
 	processing_start_time = t;
-
-	expire_timers(src_ps);
+	expire_timers();
 
 	zeek::detail::SegmentProfiler* sp = nullptr;
 
@@ -256,8 +252,6 @@ void dispatch_packet(double t, const Packet* pkt, iosource::PktSrc* src_ps)
 
 	processing_start_time = 0.0;	// = "we're not processing now"
 	current_dispatched = 0;
-	current_iosrc = nullptr;
-	current_pktsrc = nullptr;
 	}
 
 void run_loop()

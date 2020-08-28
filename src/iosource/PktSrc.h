@@ -375,7 +375,6 @@ private:
 	double first_wallclock;
 	double current_wallclock;
 	double current_pseudo;
-	double next_sync_point; // For trace synchronziation in pseudo-realtime
 
 	std::string errbuf;
 };
