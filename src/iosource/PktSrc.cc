@@ -11,6 +11,7 @@
 #include "Sessions.h"
 #include "broker/Manager.h"
 #include "iosource/Manager.h"
+#include "packet_analysis/Manager.h"
 #include "BPF_Program.h"
 
 #include "pcap/pcap.bif.h"
@@ -169,6 +170,7 @@ void PktSrc::Process()
 	run_state::detail::current_pktsrc = this;
 #pragma GCC diagnostic pop
 
+	packet_mgr->ProcessPacket(&current_packet);
 	run_state::detail::dispatch_packet(&current_packet, sessions);
 
 	run_state::detail::current_iosrc = nullptr;
