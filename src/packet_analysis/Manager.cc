@@ -129,6 +129,22 @@ void Manager::ProcessPacket(Packet* packet)
 		}
 
 	auto result = analyzer->AnalyzePacket(packet->cap_len, packet->data, packet);
+	switch ( result ) {
+	case AnalyzerResult::Failed:
+		{
+		packet->InvalidateLayer2();
+		break;
+		}
+	case AnalyzerResult::Terminate:
+		{
+		packet->session_analysis = false;
+		break;
+		}
+	case AnalyzerResult::Success:
+		{
+		// NetSession will conduct session analysis
+		}
+	}
 	}
 
 AnalyzerPtr Manager::InstantiateAnalyzer(const Tag& tag)

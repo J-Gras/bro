@@ -12,6 +12,7 @@ namespace zeek::packet_analysis {
  */
 enum class AnalyzerResult {
 	Failed,   // Analysis failed
+	Success,  // Analysis succeeded and we continue with session analysis
 	Terminate // Analysis succeeded and there is no further analysis to do
 };
 

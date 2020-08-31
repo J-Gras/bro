@@ -95,7 +95,7 @@ zeek::packet_analysis::AnalyzerResult EthernetAnalyzer::AnalyzePacket(size_t len
 		if ( eth_analyzer )
 			return eth_analyzer->AnalyzePacket(len, data, packet);
 
-		return AnalyzerResult::Terminate;
+		return AnalyzerResult::Success;
 		}
 
 	// Undefined (1500 < EtherType < 1536)

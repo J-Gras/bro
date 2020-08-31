@@ -51,5 +51,5 @@ zeek::packet_analysis::AnalyzerResult MPLSAnalyzer::AnalyzePacket(size_t len,
 		}
 
 	packet->hdr_size = (data - packet->data);
-	return AnalyzerResult::Terminate;
+	return AnalyzerResult::Success;
 	}

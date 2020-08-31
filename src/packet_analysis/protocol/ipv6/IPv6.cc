@@ -16,5 +16,5 @@ zeek::packet_analysis::AnalyzerResult IPv6Analyzer::AnalyzePacket(size_t len,
 	packet->hdr_size = static_cast<uint32_t>(data - packet->data);
 
 	// Leave packet analyzer land
-	return AnalyzerResult::Terminate;
+	return AnalyzerResult::Success;
 	}
