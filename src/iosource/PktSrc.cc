@@ -171,7 +171,6 @@ void PktSrc::Process()
 #pragma GCC diagnostic pop
 
 	packet_mgr->ProcessPacket(&current_packet);
-	run_state::detail::dispatch_packet(&current_packet, sessions);
 
 	run_state::detail::current_iosrc = nullptr;
 #pragma GCC diagnostic push

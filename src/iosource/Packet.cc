@@ -72,9 +72,9 @@ const IP_Hdr Packet::IP() const
 	return IP_Hdr((struct ip *) (data + hdr_size), false);
 	}
 
-void Packet::Weird(const char* name)
+void Packet::Weird(const char* name, const EncapsulationStack* encap)
 	{
-	sessions->Weird(name, this);
+	sessions->Weird(name, this, encap);
 	}
 
 IntrusivePtr<RecordVal> Packet::ToRawPktHdrVal() const

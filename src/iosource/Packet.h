@@ -2,10 +2,11 @@
 
 #include "zeek-config.h"
 
-#include <string>
-
 #include <stdint.h>
 #include <sys/types.h> // for u_char
+#include <string>
+#include <map>
+#include <any>
 
 #if defined(__OpenBSD__)
 #include <net/bpf.h>
@@ -18,6 +19,7 @@ ZEEK_FORWARD_DECLARE_NAMESPACED(ODesc, zeek);
 ZEEK_FORWARD_DECLARE_NAMESPACED(Val, zeek);
 ZEEK_FORWARD_DECLARE_NAMESPACED(RecordVal, zeek);
 ZEEK_FORWARD_DECLARE_NAMESPACED(IP_Hdr, zeek);
+ZEEK_FORWARD_DECLARE_NAMESPACED(EncapsulationStack, zeek);
 
 namespace zeek {
 
@@ -234,8 +236,13 @@ public:
 	 */
 	mutable bool dump_packet = false;
 
-	// Wrapper to generate a packet-level weird. Has to be public for packet analyzers to use it.
-	void Weird(const char* name);
+	/**
+	 * Key/value store for use by the packet analyzers to pass information between them.
+	 */
+	std::map<std::string, std::any> key_store;
+
+	// Wrapper to generate a packet-level weird. Has to be public for llanalyzers to use it.
+	void Weird(const char* name, const EncapsulationStack* encap = nullptr);
 
 private:
 	// Renders an MAC address into its ASCII representation.

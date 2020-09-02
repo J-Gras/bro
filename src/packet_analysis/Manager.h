@@ -8,6 +8,8 @@
 #include "iosource/Packet.h"
 #include "Dispatcher.h"
 
+ZEEK_FORWARD_DECLARE_NAMESPACED(PacketProfiler, zeek::detail);
+
 namespace zeek::packet_analysis {
 
 class Analyzer;
@@ -23,7 +25,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~Manager() = default;
+	~Manager();
 
 	/**
 	 * Second-stage initialization of the manager. This is called late
@@ -68,6 +70,8 @@ public:
 	 */
 	void ProcessPacket(Packet* packet);
 
+	uint64_t PacketsProcessed() const	{ return num_packets_processed; }
+
 private:
 	/**
 	 * Instantiates a new analyzer instance.
@@ -91,8 +95,12 @@ private:
 
 	std::map<std::string, AnalyzerPtr> analyzers;
 	AnalyzerPtr root_analyzer = nullptr;
+
+	uint64_t num_packets_processed = 0;
+	detail::PacketProfiler* pkt_profiler = nullptr;
 };
 
 }
 
+// TODO: this should be namespaced, not global
 extern zeek::packet_analysis::Manager* packet_mgr;

@@ -16,14 +16,12 @@
 ZEEK_FORWARD_DECLARE_NAMESPACED(EncapsulationStack, zeek);
 ZEEK_FORWARD_DECLARE_NAMESPACED(EncapsulatingConn, zeek);
 ZEEK_FORWARD_DECLARE_NAMESPACED(Packet, zeek);
-ZEEK_FORWARD_DECLARE_NAMESPACED(PacketProfiler, zeek::detail);
 ZEEK_FORWARD_DECLARE_NAMESPACED(Connection, zeek);
 class ConnCompressor;
 
 namespace zeek { struct ConnID; }
 using ConnID [[deprecated("Remove in v4.1. Use zeek::ConnID.")]] = zeek::ConnID;
 
-ZEEK_FORWARD_DECLARE_NAMESPACED(Discarder, zeek::detail);
 ZEEK_FORWARD_DECLARE_NAMESPACED(SteppingStoneManager, zeek, analyzer::stepping_stone);
 ZEEK_FORWARD_DECLARE_NAMESPACED(ARP_Analyzer, zeek, analyzer::arp);
 
@@ -59,19 +57,12 @@ public:
 
 	void Done();	// call to drain events before destructing
 
-	// Returns a reassembled packet, or nil if there are still
-	// some missing fragments.
-	detail::FragReassembler* NextFragment(double t, const IP_Hdr* ip,
-	                                      const u_char* pkt);
-
 	// Looks up the connection referred to by the given Val,
 	// which should be a conn_id record.  Returns nil if there's
 	// no such connection or the Val is ill-formed.
 	Connection* FindConnection(Val* v);
 
 	void Remove(Connection* c);
-	void Remove(detail::FragReassembler* f);
-
 	void Insert(Connection* c);
 
 	// Generating connection_pending events for all connections
@@ -88,9 +79,9 @@ public:
 	void Weird(const char* name, const IP_Hdr* ip,
 	           const EncapsulationStack* encap = nullptr, const char* addl = "");
 
-	detail::PacketFilter* GetPacketFilter()
+	detail::PacketFilter* GetPacketFilter(bool init=true)
 		{
-		if ( ! packet_filter )
+		if ( ! packet_filter && init )
 			packet_filter = new detail::PacketFilter(detail::packet_filter_default);
 		return packet_filter;
 		}
@@ -174,12 +165,16 @@ public:
 	unsigned int MemoryAllocation();
 	analyzer::tcp::TCPStateStats tcp_stats;	// keeps statistics on TCP states
 
+	// Record the given packet (if a dumper is active).  If len=0
+	// then the whole packet is recorded, otherwise just the first
+	// len bytes.
+	void DumpPacket(const Packet *pkt, int len=0);
+
 protected:
 	friend class ConnCompressor;
 	friend class detail::IPTunnelTimer;
 
 	using ConnectionMap = std::map<detail::ConnIDKey, Connection*>;
-	using FragmentMap = std::map<detail::FragReassemblerKey, detail::FragReassembler*>;
 
 	Connection* NewConn(const detail::ConnIDKey& k, double t, const ConnID* id,
 			const u_char* data, int proto, uint32_t flow_label,
@@ -205,11 +200,6 @@ protected:
 				TransportProto transport_proto,
 				uint8_t tcp_flags, bool& flip_roles);
 
-	// Record the given packet (if a dumper is active).  If len=0
-	// then the whole packet is recorded, otherwise just the first
-	// len bytes.
-	void DumpPacket(const Packet *pkt, int len=0);
-
 	// For a given protocol, checks whether the header's length as derived
 	// from lower-level headers or the length actually captured is less
 	// than that protocol's minimum header size.
@@ -226,7 +216,6 @@ protected:
 	ConnectionMap tcp_conns;
 	ConnectionMap udp_conns;
 	ConnectionMap icmp_conns;
-	FragmentMap fragments;
 
 	SessionStats stats;
 
@@ -236,10 +225,7 @@ protected:
 	IPTunnelMap ip_tunnels;
 
 	analyzer::stepping_stone::SteppingStoneManager* stp_manager;
-	detail::Discarder* discarder;
 	detail::PacketFilter* packet_filter;
-	uint64_t num_packets_processed;
-	detail::PacketProfiler* pkt_profiler;
 };
 
 namespace detail {
@@ -256,21 +242,6 @@ public:
 
 protected:
 	NetSessions::IPPair tunnel_idx;
-};
-
-
-class FragReassemblerTracker {
-public:
-	FragReassemblerTracker(NetSessions* s, FragReassembler* f)
-		: net_sessions(s), frag_reassembler(f)
-		{ }
-
-	~FragReassemblerTracker()
-		{ net_sessions->Remove(frag_reassembler); }
-
-private:
-	NetSessions* net_sessions;
-	FragReassembler* frag_reassembler;
 };
 
 } // namespace detail
