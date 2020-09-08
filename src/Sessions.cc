@@ -46,29 +46,6 @@ zeek::NetSessions* zeek::sessions;
 zeek::NetSessions*& sessions = zeek::sessions;
 
 namespace zeek {
-namespace detail {
-
-void IPTunnelTimer::Dispatch(double t, bool is_expire)
-	{
-	NetSessions::IPTunnelMap::const_iterator it =
-			sessions->ip_tunnels.find(tunnel_idx);
-
-	if ( it == sessions->ip_tunnels.end() )
-		return;
-
-	double last_active = it->second.second;
-	double inactive_time = t > last_active ? t - last_active : 0;
-
-	if ( inactive_time >= BifConst::Tunnel::ip_tunnel_timeout )
-		// tunnel activity timed out, delete it from map
-		sessions->ip_tunnels.erase(tunnel_idx);
-
-	else if ( ! is_expire )
-		// tunnel activity didn't timeout, schedule another timer
-		timer_mgr->Add(new IPTunnelTimer(t, tunnel_idx));
-	}
-
-} // namespace detail
 
 NetSessions::NetSessions()
 	{
@@ -184,31 +161,6 @@ void NetSessions::NextPacket(double t, const Packet* pkt)
 		}
 	}
 
-static unsigned int gre_header_len(uint16_t flags)
-	{
-	unsigned int len = 4;  // Always has 2 byte flags and 2 byte protocol type.
-
-	if ( flags & 0x8000 )
-		// Checksum/Reserved1 present.
-		len += 4;
-
-	// Not considering routing presence bit since it's deprecated ...
-
-	if ( flags & 0x2000 )
-		// Key present.
-		len += 4;
-
-	if ( flags & 0x1000 )
-		// Sequence present.
-		len += 4;
-
-	if ( flags & 0x0080 )
-		// Acknowledgement present.
-		len += 4;
-
-	return len;
-	}
-
 void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr,
                                const EncapsulationStack* encapsulation)
 	{
@@ -217,7 +169,7 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 	uint16_t ip_hdr_len = ip_hdr->HdrLen();
 
 	len -= ip_hdr_len;	// remove IP header
-	caplen -= ip_hdr_len;
+	caplen -= ip_hdr_len;	// remove IP header
 
 	int proto = ip_hdr->NextProto();
 
@@ -231,8 +183,6 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 	id.dst_addr = ip_hdr->DstAddr();
 	ConnectionMap* d = nullptr;
 	BifEnum::Tunnel::Type tunnel_type = BifEnum::Tunnel::IP;
-	int gre_version = -1;
-	int gre_link_type = DLT_RAW;
 
 	switch ( proto ) {
 	case IPPROTO_TCP:
@@ -352,9 +302,9 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 	conn->NextPacket(t, is_orig, ip_hdr, len, caplen, data,
 	                 record_packet, record_content, pkt);
 
-	// TODO: this used to check that the fragment was already recorded, and not record it a second
-	// time. That info needs to be passed down into DoNextPacket here.
-	if ( record_packet )
+	// We skip this block for reassembled packets because the pointer
+	// math wouldn't work.
+	if ( ! ip_hdr->reassembled && record_packet )
 		{
 		if ( record_content )
 			pkt->dump_packet = true;	// save the whole thing
@@ -365,85 +315,6 @@ void NetSessions::DoNextPacket(double t, const Packet* pkt, const IP_Hdr* ip_hdr
 			DumpPacket(pkt, hdr_len);	// just save the header
 			}
 		}
-	}
-
-void NetSessions::DoNextInnerPacket(double t, const Packet* pkt,
-                                    const IP_Hdr* inner, const EncapsulationStack* prev,
-                                    const EncapsulatingConn& ec)
-	{
-	uint32_t caplen, len;
-	caplen = len = inner->TotalLen();
-
-	pkt_timeval ts;
-	int link_type;
-
-	if ( pkt )
-		ts = pkt->ts;
-	else
-		{
-		ts.tv_sec = (time_t) run_state::network_time;
-		ts.tv_usec = (suseconds_t)
-		    ((run_state::network_time - (double)ts.tv_sec) * 1000000);
-		}
-
-	const u_char* data = nullptr;
-
-	if ( inner->IP4_Hdr() )
-		data = (const u_char*) inner->IP4_Hdr();
-	else
-		data = (const u_char*) inner->IP6_Hdr();
-
-	EncapsulationStack* outer = prev ?
-			new EncapsulationStack(*prev) : new EncapsulationStack();
-	outer->Add(ec);
-
-	// Construct fake packet for DoNextPacket
-	Packet p;
-	p.Init(DLT_RAW, &ts, caplen, len, data, false, "");
-	p.key_store["encap"] = outer;
-	p.key_store["encap_inner_ip"] = inner;
-	packet_mgr->ProcessPacket(&p);
-
-//	DoNextPacket(t, &p, inner, outer);
-
-	delete inner;
-	delete outer;
-	}
-
-void NetSessions::DoNextInnerPacket(double t, const Packet* pkt,
-                                    uint32_t caplen, uint32_t len,
-                                    const u_char* data, int link_type,
-                                    const EncapsulationStack* prev,
-                                    const EncapsulatingConn& ec)
-	{
-	pkt_timeval ts;
-
-	if ( pkt )
-		ts = pkt->ts;
-	else
-		{
-		ts.tv_sec = (time_t) run_state::network_time;
-		ts.tv_usec = (suseconds_t)
-		    ((run_state::network_time - (double)ts.tv_sec) * 1000000);
-		}
-
-	EncapsulationStack* outer = prev ?
-			new EncapsulationStack(*prev) : new EncapsulationStack();
-	outer->Add(ec);
-
-	// Construct fake packet for DoNextPacket
-	Packet p;
-	p.Init(link_type, &ts, caplen, len, data, false, "");
-	p.key_store["encap"] = outer;
-	packet_mgr->ProcessPacket(&p);
-
-	// if ( p.Layer2Valid() && (p.l3_proto == L3_IPV4 || p.l3_proto == L3_IPV6) )
-	// 	{
-	// 	auto inner = p.IP();
-	// 	DoNextPacket(t, &p, &inner, outer);
-	// 	}
-
-	delete outer;
 	}
 
 int NetSessions::ParseIPPacket(int caplen, const u_char* const pkt, int proto,

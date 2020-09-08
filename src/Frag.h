@@ -32,7 +32,7 @@ public:
 	void DeleteTimer();
 	void ClearTimer()	{ expire_timer = nullptr; }
 
-	const IP_Hdr* ReassembledPkt()	{ return reassembled_pkt; }
+	IP_Hdr* ReassembledPkt()	{ return reassembled_pkt; }
 	const FragReassemblerKey& Key() const	{ return key; }
 
 protected:

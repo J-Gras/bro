@@ -9,6 +9,7 @@
 #include "zeek/RunState.h"
 #include "zeek/Frag.h"
 #include "zeek/Event.h"
+#include "zeek/TunnelEncapsulation.h"
 
 using namespace zeek::packet_analysis::IP;
 
@@ -32,49 +33,48 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 	EncapsulationStack* encapsulation = nullptr;
 	auto it = packet->key_store.find("encap");
 	if ( it != packet->key_store.end() )
-		encapsulation = std::any_cast<EncapsulationStack*>(*it);
+		encapsulation = std::any_cast<EncapsulationStack*>(it->second);
 
-	// Assume we're pointing at IP. Just figure out which version.
-	if ( sizeof(struct ip) >= len )
+	// Check to make sure we have enough data left for an IP header to be here.
+	if ( len < sizeof(struct ip) )
 		{
-		packet->Weird("packet_analyzer_truncated_header");
+		packet->Weird("truncated_IP");
 		return false;
 		}
 
 	// TODO: i feel like this could be generated as we move along the header hierarchy.
+	// TODO: the sessions code expects that the header size does not include the ip header. Should
+	// this change?
 	packet->hdr_size = static_cast<int32_t>(data - packet->data);
 
-	if ( packet->hdr_size > packet->cap_len )
-		{
-		packet->Weird("truncated_link_frame");
-		return false;
-		}
-
+	// Cast the current data pointer to an IP header pointer so we can use it to get some
+	// data about the header.
 	auto ip = (const struct ip *)data;
 	uint32_t protocol = ip->ip_v;
-	uint32_t caplen = packet->cap_len - packet->hdr_size;
 
 	std::unique_ptr<IP_Hdr> ip_hdr = nullptr;
 	if ( protocol == 4 )
 		{
-		// TODO: double-check
-		if ( sizeof(struct ip) >= caplen )
+		// TODO: didn't we do this already?
+		if ( len < sizeof(struct ip) )
 			{
 			packet->Weird("truncated_IP");
 			return false;
 			}
 
 		ip_hdr = std::make_unique<IP_Hdr>(ip, false);
+		packet->l3_proto = L3_IPV4;
 		}
 	else if ( protocol == 6 )
 		{
-		if ( caplen < sizeof(struct ip6_hdr) )
+		if ( len < sizeof(struct ip6_hdr) )
 			{
 			packet->Weird("truncated_IP");
 			return false;
 			}
 
-		ip_hdr = std::make_unique<IP_Hdr>((const struct ip6_hdr*) data, false, caplen);
+		ip_hdr = std::make_unique<IP_Hdr>((const struct ip6_hdr*) data, false, len);
+		packet->l3_proto = L3_IPV6;
 		}
 	else
 		{
@@ -84,8 +84,7 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 
 	const struct ip* ip4 = ip_hdr->IP4_Hdr();
 
-	// TODO: Shouldn't this be the same as the len value we have already? Should this just check
-	// for whether they don't match and throw a weird for that?
+	// total_len is the length of the packet minus all of the headers so far, including IP
 	uint32_t total_len = ip_hdr->TotalLen();
 	if ( total_len == 0 )
 		{
@@ -96,7 +95,6 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		total_len = packet->cap_len - packet->hdr_size;
 		}
 
-	// TODO: this basically duplicates an earlier check, I think
 	if ( packet->len < total_len + packet->hdr_size )
 		{
 		packet->Weird("truncated_IP", encapsulation);
@@ -106,13 +104,13 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 	// For both of these it is safe to pass ip_hdr because the presence
 	// is guaranteed for the functions that pass data to us.
 	uint16_t ip_hdr_len = ip_hdr->HdrLen();
-	if ( ip_hdr_len > len )
+	if ( ip_hdr_len > total_len )
 		{
 		sessions->Weird("invalid_IP_header_size", ip_hdr.get(), encapsulation);
 		return false;
 		}
 
-	if ( ip_hdr_len > caplen )
+	if ( ip_hdr_len > len )
 		{
 		sessions->Weird("internally_truncated_header", ip_hdr.get(), encapsulation);
 		return false;
@@ -136,9 +134,8 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		}
 
 	// Ignore if packet matches packet filter.
-	// TODO: set the right variable values below
 	detail::PacketFilter* packet_filter = sessions->GetPacketFilter(false);
-	if ( packet_filter && packet_filter->Match(ip_hdr.get(), len, caplen) )
+	if ( packet_filter && packet_filter->Match(ip_hdr.get(), total_len, len) )
 		 return false;
 
 	if ( ! packet->l2_checksummed && ! detail::ignore_checksums && ip4 &&
@@ -148,7 +145,7 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		return false;
 		}
 
-	if ( discarder && discarder->NextPacket(ip_hdr.get(), len, caplen) )
+	if ( discarder && discarder->NextPacket(ip_hdr.get(), total_len, len) )
 		return false;
 
 	detail::FragReassembler* f = nullptr;
@@ -157,7 +154,7 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		{
 		packet->dump_packet = true;	// always record fragments
 
-		if ( caplen < len )
+		if ( len < total_len )
 			{
 			sessions->Weird("incompletely_captured_fragment", ip_hdr.get(), encapsulation);
 
@@ -170,18 +167,28 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		else
 			{
 			f = detail::fragment_mgr->NextFragment(run_state::processing_start_time, ip_hdr.get(), packet->data + packet->hdr_size);
-			const IP_Hdr* ih = f->ReassembledPkt();
+			IP_Hdr* ih = f->ReassembledPkt();
 			if ( ! ih )
 				// It didn't reassemble into anything yet.
-				return false;
+				return true;
 
 			ip4 = ih->IP4_Hdr();
-			ip_hdr = std::unique_ptr<IP_Hdr>(ih->Copy());
 
-			caplen = len = ip_hdr->TotalLen();
+			// Delete the old ip_hdr and replace it with this one.
+			ip_hdr.reset(ih);
+
+			len = total_len = ip_hdr->TotalLen();
 			ip_hdr_len = ip_hdr->HdrLen();
+			packet->cap_len = total_len + packet->hdr_size;
 
-			if ( ip_hdr_len > len )
+			// TODO: in the old code, the data pointer is updated to point at the IP header's
+			// payload, so it contains all of the data when it's processed. This isn't a big
+			// deal for when we pass it down into the session analyzers, since that does the
+			// same itself. should it be updated here for the case where a fragmented packet
+			// is actually tunneled? is that a thing that can happen? Does updating the data
+			// pointer without also updating the one in packet cause any problems?
+
+			if ( ip_hdr_len > total_len )
 				{
 				sessions->Weird("invalid_IP_header_size", ip_hdr.get(), encapsulation);
 				return false;
@@ -213,7 +220,7 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		if ( ! ignore_checksums && mobility_header_checksum(ip_hdr) != 0xffff )
 			{
 			sessions->Weird("bad_MH_checksum", packet, encapsulation);
-			return;
+			return false;
 			}
 
 		if ( mobile_ipv6_message )
@@ -222,50 +229,52 @@ bool IPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 		if ( ip_hdr->NextProto() != IPPROTO_NONE )
 			sessions->Weird("mobility_piggyback", packet, encapsulation);
 
-		return;
+		return true;
 		}
 #endif
 
-	// TODO: Where does it go from here? Into run_state::dispatch_packet? Directly into Sessions::NextPacket?
-	int proto = ip_hdr->NextProto();
-
 	// Advance the data pointer past the IP header based on the header length
 	data += ip_hdr_len;
+	len -= ip_hdr_len;
+
+	bool return_val = true;
+	int proto = ip_hdr->NextProto();
+
+	packet->key_store["ip_hdr"] = ip_hdr.get();
+	packet->key_store["proto"] = proto;
 
 	switch ( proto ) {
 	case IPPROTO_TCP:
 	case IPPROTO_UDP:
 	case IPPROTO_ICMP:
 	case IPPROTO_ICMPV6:
-		packet->hdr_size = static_cast<int32_t>(data - packet->data);
 		sessions->DoNextPacket(run_state::processing_start_time, packet, ip_hdr.get(), encapsulation);
-		break;
-	case IPPROTO_GRE:
-		// TODO: strip the header, pass to the GRE plugin, which will pass it back here again
-		break;
-	case IPPROTO_IPV4:
-	case IPPROTO_IPV6:
-		// TODO: strip the header, pass back into the IP plugin
 		break;
 	case IPPROTO_NONE:
 		// If the packet is encapsulated in Teredo, then it was a bubble and
 		// the Teredo analyzer may have raised an event for that, else we're
 		// not sure the reason for the No Next header in the packet.
-		// TODO
-		// if ( ! ( encapsulation &&
-		//      encapsulation->LastType() == BifEnum::Tunnel::TEREDO ) )
-		// 	Weird("ipv6_no_next", packet);
-
+		if ( ! ( encapsulation &&
+		         encapsulation->LastType() == BifEnum::Tunnel::TEREDO ) )
+			{
+			sessions->Weird("ipv6_no_next", packet);
+			return_val = false;
+			}
 		break;
 	default:
-		sessions->Weird("unknown_protocol", packet, encapsulation, util::fmt("%d", proto));
-		return false;
+		// For everything else, pass it on to another analyzer. If there's no one to handle that,
+		// it'll report a Weird.
+		return_val = ForwardPacket(len, data, packet, proto);
+		break;
 	}
 
 	if ( f )
-		// Above we already recorded the fragment in its entirety.
-		// TODO: re: above comment, where?
+		{
+		// If this was a fragment, we need to release the pointer here so that it doesn't get
+		// deleted. Deleting this one will be the responsibility of the fragment tracker.
+		ip_hdr.release();
 		f->DeleteTimer();
+		}
 
-	return true;
+	return return_val;
 	}

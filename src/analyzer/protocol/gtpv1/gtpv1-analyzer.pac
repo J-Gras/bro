@@ -1,6 +1,7 @@
 %extern{
 #include "Sessions.h"
 #include "ZeekString.h"
+#include "packet_analysis/protocol/iptunnel/IPTunnel.h"
 %}
 
 %code{
@@ -713,7 +714,6 @@ flow GTPv1_Flow(is_orig: bool)
 		%{
 		ZeekAnalyzer a = connection()->zeek_analyzer();
 		zeek::Connection* c = a->Conn();
-		const zeek::EncapsulationStack* e = c->GetEncapsulation();
 
 		if ( ${pdu.packet}.length() < (int)sizeof(struct ip) )
 			{
@@ -762,9 +762,11 @@ flow GTPv1_Flow(is_orig: bool)
 			zeek::BifEvent::enqueue_gtpv1_g_pdu_packet(a, c, BuildGTPv1Hdr(pdu),
 			                                           inner->ToPktHdrVal());
 
+		const zeek::EncapsulationStack* e = c->GetEncapsulation();
 		zeek::EncapsulatingConn ec(c, BifEnum::Tunnel::GTPv1);
 
-		zeek::sessions->DoNextInnerPacket(network_time(), 0, inner, e, ec);
+		zeek::packet_analysis::IPTunnel::ip_tunnel_analyzer->ProcessEncapsulatedPacket(
+			network_time(), 0, inner, e, ec);
 
 		return true;
 		%}

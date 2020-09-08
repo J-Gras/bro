@@ -226,12 +226,6 @@ public:
 	bool l3_checksummed;
 
 	/**
-	 * Indicates whether the packet should be processed by zeek's
-	 * session analysis in NetSessions.
-	 */
-	bool session_analysis = false;
-
-	/**
 	 * Indicates whether this packet should be recorded.
 	 */
 	mutable bool dump_packet = false;

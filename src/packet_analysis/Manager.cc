@@ -86,7 +86,6 @@ void Manager::ProcessPacket(Packet* packet)
 	DBG_LOG(DBG_PACKET_ANALYSIS, "Analyzing packet %ld, ts=%.3f...", ++counter, packet->time);
 #endif
 
-	// TODO: how should encapsulated packets be handled? Should this bit be skipped for encapsulated packets?
 	zeek::detail::SegmentProfiler prof(detail::segment_logger, "dispatching-packet");
 	if ( pkt_profiler )
 		pkt_profiler->ProfilePkt(zeek::run_state::processing_start_time, packet->cap_len);
@@ -105,7 +104,6 @@ void Manager::ProcessPacket(Packet* packet)
 	if ( ! root_analyzer->ForwardPacket(packet->cap_len, packet->data, packet, packet->link_type) )
 		packet->InvalidateLayer2();
 
-	// TODO: this should probably move in to the root analyzer once that exists.
 	// TODO: this previously happened at the beginning of NetSessions::NextPacket. Does it break
 	// anything to move it to later in the process? It has to happen after header processing
 	// happens, because it requires the packet headers to be valid.
@@ -116,6 +114,11 @@ void Manager::ProcessPacket(Packet* packet)
 	if ( packet->dump_packet && ! dumped_packet )
 		// TODO: should this stay in Session?
 		sessions->DumpPacket(packet);
+	}
+
+bool Manager::ProcessInnerPacket(Packet* packet)
+	{
+	return root_analyzer->ForwardPacket(packet->cap_len, packet->data, packet, packet->link_type);
 	}
 
 AnalyzerPtr Manager::InstantiateAnalyzer(const Tag& tag)

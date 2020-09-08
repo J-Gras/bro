@@ -26,7 +26,7 @@ extern void get_final_stats();
 extern void finish_run(int drain_events);
 extern void delete_run();	// Reclaim all memory, etc.
 extern void update_network_time(double new_network_time);
-extern void dispatch_packet(const zeek::Packet* pkt, packet_analysis::PacketProcessor* processor);
+extern void dispatch_packet(zeek::Packet* pkt, zeek::iosource::PktSrc* pkt_src);
 extern void expire_timers();
 extern void zeek_terminate_loop(const char* reason);
 

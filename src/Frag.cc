@@ -297,6 +297,7 @@ void FragReassembler::BlockInserted(DataBlockMap::const_iterator /* it */)
 		struct ip* reassem4 = (struct ip*) pkt_start;
 		reassem4->ip_len = htons(frag_size + proto_hdr_len);
 		reassembled_pkt = new IP_Hdr(reassem4, true);
+		reassembled_pkt->reassembled = true;
 		DeleteTimer();
 		}
 
@@ -306,6 +307,7 @@ void FragReassembler::BlockInserted(DataBlockMap::const_iterator /* it */)
 		reassem6->ip6_plen = htons(frag_size + proto_hdr_len - 40);
 		const IPv6_Hdr_Chain* chain = new IPv6_Hdr_Chain(reassem6, next_proto, n);
 		reassembled_pkt = new IP_Hdr(reassem6, true, n, chain);
+		reassembled_pkt->reassembled = true;
 		DeleteTimer();
 		}
 

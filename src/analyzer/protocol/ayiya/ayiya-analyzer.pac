@@ -1,6 +1,7 @@
 %extern{
 #include "Sessions.h"
 #include "Conn.h"
+#include "packet_analysis/protocol/iptunnel/IPTunnel.h"
 %}
 
 connection AYIYA_Conn(zeek_analyzer: ZeekAnalyzer)
@@ -86,7 +87,8 @@ flow AYIYA_Flow
 
 		zeek::EncapsulatingConn ec(c, BifEnum::Tunnel::AYIYA);
 
-		zeek::sessions->DoNextInnerPacket(network_time(), 0, inner, e, ec);
+		zeek::packet_analysis::IPTunnel::ip_tunnel_analyzer->ProcessEncapsulatedPacket(
+			network_time(), 0, inner, e, ec);
 
 		return true;
 		%}

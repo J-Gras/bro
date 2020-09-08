@@ -70,6 +70,16 @@ public:
 	 */
 	void ProcessPacket(Packet* packet);
 
+	/**
+	 * Process the inner packet of an encapsulation. This can be used by tunnel
+	 * analyzers to process a inner packet from the "beginning" directly through
+	 * the root analyzer. This short-circuits some of the additional processing
+	 * that happens in ProcessPacket().
+	 *
+	 * @param packet The packet to process.
+	 */
+	bool ProcessInnerPacket(Packet* packet);
+
 	uint64_t PacketsProcessed() const	{ return num_packets_processed; }
 
 private:
